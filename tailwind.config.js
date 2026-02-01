@@ -20,9 +20,38 @@ export default {
       backgroundImage: {
         // Linear gradient
         'brand-linear': 'linear-gradient(180deg, #1F4C74 50%, #24E1C9 100%)',
+        'brand-getstarted': 'linear-gradient(90deg, #22979F 0%, #205D7E 80%)',
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }) {
+      addComponents({
+        '.btn-flash': {
+          position: 'relative',
+          overflow: 'hidden',
+          zIndex: '0',
+        },
+        '.btn-flash::after': {
+          content: "''",
+          position: 'absolute',
+          left: '-30%',
+          top: '120%',
+          width: '160%',
+          height: '60%',
+          pointerEvents: 'none',
+          zIndex: '0',
+          background: 'linear-gradient(180deg, rgba(34,151,159,0.95) 0%, rgba(34,151,159,0.6) 40%, rgba(34,151,159,0) 100%)',
+          transform: 'rotate(-20deg) translateY(0)',
+          opacity: '0',
+          transition: 'transform 450ms cubic-bezier(.2,.9,.2,1), opacity 300ms ease',
+        },
+        '.btn-flash:hover::after, .btn-flash:focus::after': {
+          transform: 'rotate(-20deg) translateY(-220%)',
+          opacity: '1',
+        },
+      })
+    }
+  ],
 }
 
