@@ -13,6 +13,18 @@ export default {
         'brand-1f4c74': '#1F4C74',
         'brand-24e1c9': '#24E1C9',
 
+        // Profile Member
+        'brand-fill': 'rgba(4,4,9, 0.50)',
+        'brand-stroke': '#4A4A4A',
+
+        // Filter Button Colors
+        'filter-all-bg': 'rgba(183,183,183,0.45)',
+        'filter-all-border': '#979797',
+        'filter-red-bg': 'rgba(222,0,0,0.45)',
+        'filter-red-border': '#980000',
+        'filter-sage-bg': 'rgba(34,165,167,0.45)',
+        'filter-sage-border': '#22A5A7',
+
         // Just Test Tailwind Colors
         primary: '#3b82f6',
         accent: '#8b5cf6',
@@ -21,6 +33,25 @@ export default {
         // Linear gradient
         'brand-linear': 'linear-gradient(180deg, #1F4C74 50%, #24E1C9 100%)',
         'brand-getstarted': 'linear-gradient(90deg, #22979F 0%, #205D7E 80%)',
+
+        // Background
+        'brand-overlay': 'linear-gradient(180deg, rgba(24,107,181,0.04), rgba(0,0,0,0) 60%)',
+        'brand-vignette': `
+          radial-gradient(
+            ellipse 90% 50% at center,
+            #0B243A 0%,
+            #0A2034 10%,
+            #091C2E 20%,
+            #081828 30%,
+            #071421 40%,
+            #06101B 50%,
+            #050C15 60%,
+            #04080F 70%,
+            #030509 80%,
+            #020204 90%,
+            #000000 100%
+          )
+        `,
       },
     },
   },
