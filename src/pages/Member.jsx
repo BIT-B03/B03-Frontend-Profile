@@ -9,6 +9,11 @@ import Filters, { sortMembers } from '../components/member/common/Filters';
 import { getCachedData, setCachedData } from '../utils/cache';
 
 function App() {
+    const navItems = [
+        { label: 'Home', href: '/' },
+        { label: 'Project', href: '#project' },
+        { label: 'People', href: '/people' }
+    ];
     const [allUsers, setAllUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -83,8 +88,8 @@ function App() {
 
         return (
             <BackgroundLayout>
-                <Navbar />
-                <div className="max-w-7xl mx-auto px-4 py-12">
+                <Navbar navItems={navItems} />
+                <div className="pt-20 max-w-7xl mx-auto px-4 py-12">
                     <TitleSection />
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {skeletonItems.map((_, idx) => (
@@ -103,9 +108,9 @@ function App() {
 
     return (
         <BackgroundLayout>
-            <Navbar />
+            <Navbar navItems={navItems} />
 
-            <div className="max-w-7xl mx-auto px-4 py-12">
+            <div className="pt-20 max-w-7xl mx-auto px-4 py-12">
                 <TitleSection />
 
                 <div className="mb-12">
