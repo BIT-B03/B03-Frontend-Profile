@@ -5,7 +5,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="w-full">
+    <header className="w-full mt-4">
       <nav className="bg-[rgba(8,10,15,0.9)] backdrop-blur-sm text-white px-4 py-2 md:px-6 md:py-3 rounded-xl shadow-lg mx-3 border border-white/10 ring-1 ring-white/10">
         <div className="w-full flex items-center gap-4 pl-3">
           <div className="flex items-center space-x-2">
@@ -15,9 +15,9 @@ export default function Navbar() {
           </div>
 
           <ul className="hidden md:flex space-x-4 text-sm font-medium">
-            <li><a href="#" className="hover:opacity-90">Home</a></li>
+            <li><a href="/" className="hover:opacity-90">Home</a></li>
             <li><a href="#" className="hover:opacity-90">Project</a></li>
-            <li><a href="#" className="hover:opacity-90">People</a></li>
+            <li><a href="/people" className="hover:opacity-90">People</a></li>
           </ul>
 
           <div className="flex items-center space-x-3 ml-auto">
