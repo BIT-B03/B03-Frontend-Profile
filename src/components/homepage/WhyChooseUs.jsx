@@ -28,7 +28,7 @@ export default function WhyChooseUs() {
     <section className="mt-44 mb-20 space-y-12">
       <div className="flex items-start justify-between gap-6">
         <div className="md:flex-1 min-w-0 pr-4">
-          <h3 className="text-2xl font-bold mb-4">Why Choose Us!</h3>
+          <h3 className="text-4xl font-bold mb-4">Why Choose Us!</h3>
           <p className="text-slate-300 leading-relaxed">
             because by joining this team, you will get real experience working on team projects, having a discussion team,
             having a new and supportive environment
