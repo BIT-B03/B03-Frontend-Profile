@@ -24,7 +24,13 @@ const RegistrationSuccess = () => {
 
   return (
     <BackgroundLayout>
-      <Navbar />
+      <Navbar
+        navItems={[]}
+        showNavItems={false}
+        brandText="BIT-B03"
+        rightCtaText="Already have an account?"
+        rightCtaHref="/login"
+      />
       <main className="max-w-7xl mx-auto px-4 py-10 sm:py-14">
         <div className="min-h-[calc(100vh-160px)] flex items-center justify-center">
           <RegistrationSuccessContent

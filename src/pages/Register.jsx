@@ -4,11 +4,21 @@ import Navbar from '../components/Navbar';
 import BackgroundLayout from '../components/layout/GuestMemberBackground';
 import RegisterForm from '../components/register/RegisterForm';
 
+// Navbar configured to hide nav items and show brand/login CTA
+
+
 function Register() {
   return (
     <BackgroundLayout>
-      <Navbar />
-      <main className="max-w-7xl mx-auto px-4 py-10">
+      <Navbar
+        navItems={[]}
+        showNavItems={false}
+        brandText="BIT-B03"
+        rightCtaText="Already have an account?"
+        rightCtaHref="/login"
+      />
+      {/* Offset for fixed navbar */}
+      <main className="max-w-7xl mx-auto px-4 pt-20 pb-10">
         <RegisterForm />
       </main>
     </BackgroundLayout>
