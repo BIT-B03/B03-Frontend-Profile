@@ -8,6 +8,7 @@ export const MarkRegistrationSuccess = (email) => {
       sessionStorage.setItem(STORAGE_EMAIL_KEY, email);
     }
   } catch {
+    // ignore storage errors
   }
 };
 

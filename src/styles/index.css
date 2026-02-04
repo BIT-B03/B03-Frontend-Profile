@@ -2,6 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes floatSoft {
+    0%,
+    100% {
+        transform: translateY(-8px);
+    }
+
+    50% {
+        transform: translateY(8px);
+    }
+}
+
+.animate-float-soft {
+    animation: floatSoft 9s ease-in-out infinite;
+}
+
+@keyframes scanline {
+    0% {
+        transform: translateX(-25%);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(125%);
+        opacity: 0;
+    }
+}
+
+.animate-scanline {
+    animation: scanline 4.5s ease-in-out infinite;
+}
+
 @keyframes slideInRight {
     from {
         opacity: 0;
@@ -45,4 +84,10 @@
     background-repeat: no-repeat;
     background-size: 200px 100%;
     animation: skeletonShimmer 1.2s ease-in-out infinite;
+}
+
+/* Hide native password reveal/clear icons (often black in some browsers) */
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear {
+    display: none;
 }
