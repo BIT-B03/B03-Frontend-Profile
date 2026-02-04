@@ -10,6 +10,11 @@ import DescriptionSection from '../components/member/detail/DescriptionSection';
 import { getCachedData, setCachedData } from '../utils/cache';
 
 function App() {
+    const navItems = [
+        { label: 'Home', href: '/' },
+        { label: 'Project', href: '#project' },
+        { label: 'People', href: '/people' }
+    ];
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -54,9 +59,9 @@ function App() {
     if (loading) {
         return (
             <BackgroundLayout>
-                <Navbar />
+                <Navbar navItems={navItems} />
 
-                <main className="max-w-8xl mx-auto px-4 py-5">
+                <main className="pt-20 max-w-8xl mx-auto px-4 py-5">
                     <div className="grid grid-cols-1 lg:[grid-template-columns:320px_1fr] gap-5 items-stretch">
                         {/* Left: profile card skeleton */}
                         <div className="flex justify-center lg:justify-start">
@@ -78,9 +83,9 @@ function App() {
 
     return (
         <BackgroundLayout>
-            <Navbar />
+            <Navbar navItems={navItems} />
 
-            <main className="max-w-8xl mx-auto px-4 py-5">
+            <main className="pt-20 max-w-8xl mx-auto px-4 py-5">
                 {error && (
                     <div className="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <p className="text-red-200 text-sm sm:text-base">

@@ -5,7 +5,7 @@ export default function HeroSection() {
     <header className="relative overflow-visible pb-40">
       <div className="relative z-10 pt-64 pb-28">
         <div className="max-w-5xl mx-auto text-center px-6">
-          <h1 className="text-5xl md:text-8xl font-extrabold leading-tight mb-4">
+          <h1 className="text-7xl md:text-8xl font-extrabold leading-tight mb-4">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-200">Create.</span>
             <span className="ml-2 bg-clip-text text-transparent bg-gradient-to-r from-[#24E1C9] to-[#1F4C74]">Own.</span>
           </h1>

@@ -1,12 +1,77 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Logo from '../assets/git-lab-svgrepo-com.svg'
+import { useNavigate, useLocation } from 'react-router-dom'
 
-export default function Navbar() {
+export default function Navbar({ navItems = [
+  { label: 'Home', href: '#' },
+  { label: 'Project', href: '#' },
+  { label: 'People', href: '#' }
+] }) {
   const [open, setOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('')
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = navItems.map(item => item.href.replace('#', ''))
+      
+      for (const sectionId of sections) {
+        const element = document.getElementById(sectionId)
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            setActiveSection(sectionId)
+            break
+          }
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [navItems])
+
+  const handleNavClick = (e, href) => {
+    e.preventDefault()
+
+    // direct route links like "/people"
+    if (href.startsWith('/')) {
+      navigate(href)
+      setOpen(false)
+      return
+    }
+
+    // anchor on the same page
+    const targetId = href.replace('#', '')
+    const targetElement = document.getElementById(targetId)
+
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth' })
+      setOpen(false)
+      return
+    }
+
+    // fallback: map some hashes to routes when not on homepage
+    if (href === '#people') {
+      navigate('/people')
+      setOpen(false)
+      return
+    }
+    if (href === '#home') {
+      navigate('/')
+      setOpen(false)
+      return
+    }
+
+    // default fallback navigate to home
+    navigate('/')
+    setOpen(false)
+  }
 
   return (
-    <header className="w-full mt-4">
-      <nav className="bg-[rgba(8,10,15,0.9)] backdrop-blur-sm text-white px-4 py-2 md:px-6 md:py-3 rounded-xl shadow-lg mx-3 border border-white/10 ring-1 ring-white/10">
+    <header className="fixed top-3 z-50 w-full">
+      <nav className="bg-[rgba(8,10,15,0.75)] backdrop-blur-md text-white px-4 py-2 md:px-6 md:py-3 rounded-xl shadow-lg mx-3 border border-white/10 ring-1 ring-white/10">
         <div className="w-full flex items-center gap-4 pl-3">
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 flex items-center justify-center rounded-full">
@@ -18,23 +83,40 @@ export default function Navbar() {
             <li><a href="/" className="hover:opacity-90">Home</a></li>
             <li><a href="#" className="hover:opacity-90">Project</a></li>
             <li><a href="/people" className="hover:opacity-90">Peoplez</a></li>
+            {navItems.map((item, idx) => {
+              const sectionId = item.href.replace('#', '')
+              const isActive = activeSection === sectionId
+              return (
+                <li key={idx}>
+                  <a 
+                    href={item.href}
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    className={`px-3 py-1.5 rounded-lg transition-all duration-300 border border-transparent ${
+                      isActive 
+                        ? 'bg-brand-getstarted text-pure-white font-bold' 
+                        : 'hover:bg-[rgba(34,165,167,0.45)] hover:border-[#22A5A7] hover:text-pure-white'
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              )
+            })}
           </ul>
 
           <div className="flex items-center space-x-3 ml-auto">
-            {/* Sign in - same shape as desktop, slightly compact on mobile */}
             <a
               href="#"
-              className="inline-flex items-center justify-center text-sm opacity-90 hover:opacity-100 px-2 py-1 rounded-md md:px-3 md:py-1.5"
+              onClick={(e) => { e.preventDefault() }}
+              className="inline-flex items-center justify-center text-sm px-2 py-1 rounded-md md:px-3 md:py-1.5 transition-all duration-200 border border-transparent hover:bg-[rgba(34,165,167,0.45)] hover:border-[#22A5A7] hover:text-pure-white"
             >
               Sign in
             </a>
 
-            {/* Get Started - same shape as desktop, slightly compact on mobile */}
             <button className="bg-brand-getstarted text-pure-white px-3 py-1.5 rounded-lg transition-all duration-200 hover:opacity-90 font-bold text-sm relative overflow-hidden btn-flash">
               <span className="relative z-10">Get Started</span>
             </button>
 
-            {/* mobile hamburger */}
             <button
               onClick={() => setOpen(v => !v)}
               aria-expanded={open}
@@ -56,16 +138,29 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* mobile menu */}
         {open && (
           <div className="md:hidden mt-3 px-4 pb-4">
             <ul className="flex flex-col gap-3 text-sm font-medium">
-              <li><a href="#" className="block py-2 px-2 rounded hover:bg-white/5">Home</a></li>
-              <li><a href="#" className="block py-2 px-2 rounded hover:bg-white/5">Project</a></li>
-              <li><a href="#" className="block py-2 px-2 rounded hover:bg-white/5">People</a></li>
+              {navItems.map((item, idx) => {
+                const sectionId = item.href.replace('#', '')
+                const isActive = activeSection === sectionId
+                return (
+                  <li key={idx}>
+                    <a 
+                      href={item.href}
+                      onClick={(e) => handleNavClick(e, item.href)}
+                      className={`block py-2 px-2 rounded transition-all duration-300 border border-transparent ${
+                        isActive 
+                          ? 'bg-brand-getstarted text-pure-white font-bold' 
+                          : 'hover:bg-[rgba(34,165,167,0.45)] hover:border-[#22A5A7] hover:text-pure-white'
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                )
+              })}
             </ul>
-
-            {/* removed duplicated buttons from dropdown so buttons remain in navbar */}
           </div>
         )}
       </nav>
