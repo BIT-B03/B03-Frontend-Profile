@@ -56,7 +56,7 @@ export default {
     },
   },
   plugins: [
-    function ({ addComponents }) {
+    function ({ addComponents, theme }) {
       addComponents({
         '.btn-flash': {
           position: 'relative',
@@ -80,6 +80,34 @@ export default {
         '.btn-flash:hover::after, .btn-flash:focus::after': {
           transform: 'rotate(-20deg) translateY(-220%)',
           opacity: '1',
+        },
+
+        // Glassmorphism container
+        '.glass': {
+          backgroundColor: theme('colors.brand-fill'),
+          borderColor: theme('colors.brand-stroke'),
+          borderWidth: '1px',
+          backdropFilter: 'blur(20px)',
+        },
+        '.glass-sm': {
+          backgroundColor: theme('colors.brand-fill'),
+          borderColor: theme('colors.brand-stroke'),
+          borderWidth: '1px',
+          backdropFilter: 'blur(8px)',
+        },
+        '.glass-lg': {
+          backgroundColor: theme('colors.brand-fill'),
+          borderColor: theme('colors.brand-stroke'),
+          borderWidth: '1px',
+          backdropFilter: 'blur(28px)',
+        },
+
+        // Glassmorphism white (highlighted)
+        '.glass-white': {
+          backgroundColor: 'rgba(255,255,255,0.1)',
+          borderColor: 'rgba(255,255,255,0.25)',
+          borderWidth: '1px',
+          backdropFilter: 'blur(20px)',
         },
       })
     }
