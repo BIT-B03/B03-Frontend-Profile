@@ -80,6 +80,9 @@ export default function Navbar({ navItems = [
           </div>
 
           <ul className="hidden md:flex space-x-4 text-sm font-medium">
+            <li><a href="/" className="hover:opacity-90">Home</a></li>
+            <li><a href="#" className="hover:opacity-90">Project</a></li>
+            <li><a href="/people" className="hover:opacity-90">Peoplez</a></li>
             {navItems.map((item, idx) => {
               const sectionId = item.href.replace('#', '')
               const isActive = activeSection === sectionId
