@@ -25,9 +25,9 @@ export default {
         'filter-sage-bg': 'rgba(34,165,167,0.45)',
         'filter-sage-border': '#22A5A7',
 
-        // Just Test Tailwind Colors
-        primary: '#3b82f6',
-        accent: '#8b5cf6',
+        // Members badge (blue)
+        'badge-members-bg': 'rgba(36,126,255,0.45)',
+        'badge-members-border': '#1E90FF',
       },
       backgroundImage: {
         // Linear gradient
