@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    :root {
+        /* Bridge Tailwind custom palette to plain CSS (for libraries that need inline styles) */
+        --c-dark-bg: theme(colors.dark-bg);
+        --c-muted-gray: theme(colors.muted-gray);
+        --c-pure-white: theme(colors.pure-white);
+        --c-brand-1f4c74: theme(colors.brand-1f4c74);
+        --c-brand-24e1c9: theme(colors.brand-24e1c9);
+
+        /* Glass palette */
+        --c-brand-fill: theme(colors.brand-fill);
+        --c-brand-stroke: theme(colors.brand-stroke);
+    }
+}
+
 @keyframes floatSoft {
 
     0%,
