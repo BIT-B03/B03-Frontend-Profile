@@ -104,4 +104,10 @@ export const getAvatarImageUrl = (filename) => {
     return `/api/userPublic/avatars/${safe}`;
 };
 
+// Fetch dashboard statistics for current (authenticated) user
+export const GetMyStatistics = async () => {
+    const response = await API.get('/statistik/me');
+    return response.data;
+};
+
 export default API;

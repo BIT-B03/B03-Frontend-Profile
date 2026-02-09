@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import App from './pages/app.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 import DetailMember from './pages/DetailMember.jsx';
 import Member from './pages/Member.jsx';
 import Register from './pages/Register.jsx';
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Router>
             <Routes>
                 <Route path="/" element={<App />} />
+                <Route path="dashboard" element={<Dashboard />} />
                 <Route path="people" element={<Member />} />
                 <Route path="people/:userHashedId" element={<DetailMember />} />
                 <Route path="register" element={<Register />} />

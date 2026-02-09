@@ -13,6 +13,11 @@ export default {
         'brand-1f4c74': '#1F4C74',
         'brand-24e1c9': '#24E1C9',
 
+        // Dashboard statistik accents (reusable)
+        'stat-blue': '#3B82F6',
+        'stat-red': '#EF4444',
+        'stat-yellow': '#F59E0B',
+
         // Profile Member
         'brand-fill': 'rgba(4,4,9, 0.50)',
         'brand-stroke': '#4A4A4A',
