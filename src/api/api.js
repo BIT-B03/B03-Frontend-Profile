@@ -110,4 +110,28 @@ export const GetMyStatistics = async () => {
     return response.data;
 };
 
+export const getProjectPublicData = async (projectHashedId) => {
+    try {
+        const response = await API.get(`/projectPublic/projects/${projectHashedId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching project data:", error);
+        throw error;
+    }
+};
+
+// Build preview image URL from filename/path returned by API
+export const getProjectPreviewImageUrl = (filename) => {
+    if (!filename) return null;
+    const safe = filename.startsWith('/') ? filename.slice(1) : filename;
+    return `/api/projectPublic/previews/${safe}`;
+};
+
+// Build thumbnail image URL from filename/path returned by API
+export const getProjectThumbnailImageUrl = (filename) => {
+    if (!filename) return null;
+    const safe = filename.startsWith('/') ? filename.slice(1) : filename;
+    return `/api/projectPublic/thumbnails/${safe}`;
+};
+
 export default API;

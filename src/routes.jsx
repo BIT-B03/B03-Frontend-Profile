@@ -10,6 +10,8 @@ import Member from './pages/Member.jsx';
 import Register from './pages/Register.jsx';
 import RegistrationSuccess from './pages/RegistrationSuccess.jsx';
 import LoginPage from './pages/LoginPage.jsx';
+import OurProject from './pages/OurProject.jsx';
+import DetailProject from './pages/DetailProject.jsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import ErrorHandlerPage from './pages/ErrorHandlerPage.jsx';
 import NotFoundRedirect from './pages/NotFoundRedirect.jsx';
@@ -24,6 +26,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Route path="people/:userHashedId" element={<DetailMember />} />
                 <Route path="register" element={<Register />} />
                 <Route path="login" element={<LoginPage />} />
+                <Route path="project" element={<OurProject />} />
+                <Route path="projects/:projectHashedId" element={<DetailProject />} />
                 <Route path="reset-password" element={<ResetPasswordPage />} />
                 <Route path="forgot-password" element={<Navigate to="/reset-password" replace />} />
                 <Route path="error" element={<ErrorHandlerPage />} />
