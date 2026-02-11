@@ -11,7 +11,7 @@ export default function HomePage() {
     { label: 'About', href: '#about' },
     { label: 'Contact', href: '#contact' },
     { label: 'People', href: '/people' },
-    { label: 'Project', href: '#project' }
+    { label: 'Project', href: '/project' }
   ]
 
   return (
