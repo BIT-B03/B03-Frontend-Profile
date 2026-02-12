@@ -57,7 +57,6 @@ function DetailProject() {
         fetchProjectData();
     }, [fetchProjectData]);
 
-    // Ensure the page is at the top when project detail loads
     useEffect(() => {
         if (projectData) {
             window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -70,16 +69,14 @@ function DetailProject() {
             <BackgroundLayout>
                 <Navbar navItems={navItems} />
 
-                <main className="pt-20 max-w-8xl mx-auto px-4 py-5">
+                <main className="pt-20 sm:pt-24 lg:pt-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
                     <div className="grid grid-cols-1 lg:[grid-template-columns:320px_1fr] gap-5 items-stretch">
-                        {/* Left: preview card skeleton */}
                         <div className="flex justify-center lg:justify-start">
                             <div className="bg-brand-fill border border-brand-stroke rounded-3xl p-4 shadow-2xl max-w-[320px] w-full h-[480px] skeleton-base skeleton-shimmer">
                                 <div className="w-full aspect-[4/6] rounded-2xl" />
                             </div>
                         </div>
 
-                        {/* Right: details skeleton */}
                         <div className="flex flex-col gap-4 h-full">
                             <div className="bg-brand-fill border border-brand-stroke rounded-3xl p-8 skeleton-base skeleton-shimmer h-40" />
                             <div className="bg-brand-fill border border-brand-stroke rounded-3xl p-8 skeleton-base skeleton-shimmer h-32" />
@@ -94,7 +91,7 @@ function DetailProject() {
         <BackgroundLayout>
             <Navbar navItems={navItems} />
 
-            <main className="pt-20 max-w-8xl mx-auto px-4 py-5">
+            <main className="pt-20 sm:pt-24 lg:pt-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
                 {error && (
                     <div className="mb-5 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <p className="text-red-200 text-sm sm:text-base">
@@ -121,9 +118,8 @@ function DetailProject() {
 
                 {/* Main Content */}
                 {!error && projectData && (
-                    <>
-                        {/* Project Header with Title, Status, Owner */}
-                        <div className="mb-8">
+                    <div className="space-y-10 lg:space-y-12">
+                        <div>
                             <ProjectHeader
                                 title={projectData?.title}
                                 status={projectData?.status}
@@ -131,9 +127,8 @@ function DetailProject() {
                             />
                         </div>
 
-                        {/* Preview Gallery Section - Full Width */}
                         {projectData?.preview && projectData.preview.length > 0 && (
-                            <div className="mb-10">
+                            <div>
                                 <PreviewGallery 
                                     previews={projectData.preview}
                                     title={projectData?.title}
@@ -145,11 +140,11 @@ function DetailProject() {
 
                         {/* Contributors Section */}
                         {projectData?.contributors && projectData.contributors.length > 0 && (
-                            <div className="mb-10">
+                            <div>
                                 <ContributorsSection contributors={projectData.contributors} />
                             </div>
                         )}
-                    </>
+                    </div>
                 )}
             </main>
         </BackgroundLayout>
