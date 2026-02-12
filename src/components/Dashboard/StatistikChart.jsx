@@ -10,16 +10,23 @@ const normalizeRate = (raw) => {
 	return clamp(pct, 0, 100);
 };
 
-function DonutRing({ value, size = 92, stroke = 10, label }) {
+function DonutRing({ value, size = 92, stroke = 10, label, from = '#1F4C74', to = '#24E1C9' }) {
 	const v = normalizeRate(value);
 	const r = (size - stroke) / 2;
 	const c = 2 * Math.PI * r;
 	const dash = (v / 100) * c;
+	const gradientId = React.useId();
 
 	return (
 		<div className="flex flex-col items-center">
 			<div className="relative" style={{ width: size, height: size }}>
 				<svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+					<defs>
+						<linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+							<stop offset="0%" stopColor={from} />
+							<stop offset="100%" stopColor={to} />
+						</linearGradient>
+					</defs>
 					<circle
 						cx={size / 2}
 						cy={size / 2}
@@ -32,7 +39,7 @@ function DonutRing({ value, size = 92, stroke = 10, label }) {
 						cx={size / 2}
 						cy={size / 2}
 						r={r}
-						stroke="#24e1c9"
+						stroke={`url(#${gradientId})`}
 						strokeWidth={stroke}
 						strokeLinecap="round"
 						fill="none"
@@ -70,7 +77,12 @@ export default function StatistikChart({ data, overall: overallProp }) {
 
 			<div className="mt-5">
 				<div className="flex justify-center">
-					<DonutRing value={overall?.completion_rate ?? 0} label="Overall" />
+					<DonutRing
+						value={overall?.completion_rate ?? 0}
+						label="Overall"
+						from="#1F4C74"
+						to="#24E1C9"
+					/>
 				</div>
 
 				<div className="mt-6 grid grid-cols-1 gap-2 text-xs sm:grid-cols-3">
