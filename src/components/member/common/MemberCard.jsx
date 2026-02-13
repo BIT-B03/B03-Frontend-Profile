@@ -27,7 +27,7 @@ const MemberCard = ({ member }) => {
     return (
         <div
             onClick={handleCardClick}
-            className="group relative bg-brand-fill border border-brand-stroke rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-muted-gray/20 hover:border-muted-gray/50"
+            className="group relative bg-brand-fill border border-brand-stroke rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-muted-gray/20 hover:border-muted-gray/50 w-full"
         >
             {isLoaded && (
                 <div className="absolute top-3 right-3 z-40">
