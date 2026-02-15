@@ -15,13 +15,14 @@ import DetailProject from './pages/DetailProject.jsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import ErrorHandlerPage from './pages/ErrorHandlerPage.jsx';
 import NotFoundRedirect from './pages/NotFoundRedirect.jsx';
+import ProtectedRoute from './utils/ProtectRoute';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <Router>
             <Routes>
                 <Route path="/" element={<App />} />
-                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
                 <Route path="people" element={<Member />} />
                 <Route path="people/:userHashedId" element={<DetailMember />} />
                 <Route path="register" element={<Register />} />
