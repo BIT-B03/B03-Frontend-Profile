@@ -35,9 +35,13 @@ export default function LoginForm() {
       const res = await Login({ username: username.trim(), password });
 
       const token = res?.access_token;
+      const role = res?.role;
       if (token) {
         try {
           localStorage.setItem(AUTH_TOKEN_KEY, token);
+          if (role) {
+            localStorage.setItem('role', role);
+          }
         } catch {
           // ignore storage errors
         }

@@ -30,6 +30,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem('auth_access_token');
+    const role = (localStorage.getItem('role') || '').toString().toLowerCase();
     if (!token) {
       navigate('/login', { replace: true });
       return;
@@ -40,12 +41,20 @@ export default function Dashboard() {
     const run = async () => {
       try {
         setLoading(true);
+        if (role === 'superuser') {
+          if (!cancelled) setStatsPayload(null);
+          return;
+        }
         const res = await GetMyStatistics();
         if (!cancelled) setStatsPayload(res);
       } catch (err) {
         if (cancelled) return;
 
         const status = err?.response?.status;
+        if (status === 403) {
+          if (!cancelled) setStatsPayload(null);
+          return;
+        }
         navigate('/error', {
           replace: true,
           state: toErrorPageState(err, {
@@ -79,11 +88,10 @@ export default function Dashboard() {
       
       <main
         className={`flex-1 min-w-0 transition-all duration-300 ${
-          collapsed ? 'lg:ml-20' : 'lg:ml-64'
+          collapsed ? 'lg:ml-20' : 'lg:ml-72'
         }`}
       >
         <div className="p-6 sm:p-8">
-          {/* Header */}
           <Header
             title="Dashboard"
             onMobileMenuClick={() => setMobileSidebarOpen(true)}
@@ -94,7 +102,6 @@ export default function Dashboard() {
             <DashboardLoading />
           ) : stats ? (
             <div className="space-y-4">
-              {/* Top row: cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <StatisticCard
                   title="Project"
@@ -110,7 +117,6 @@ export default function Dashboard() {
                 />
               </div>
 
-              {/* Bottom row: recent project (wide) + donut */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div className="order-2 lg:order-1 lg:col-span-2">
                   <RecentProject projects={stats.recent_projects} />
