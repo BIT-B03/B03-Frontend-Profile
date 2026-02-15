@@ -32,7 +32,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Route path="forgot-password" element={<Navigate to="/reset-password" replace />} />
                 <Route path="error" element={<ErrorHandlerPage />} />
                 <Route path="registration-success" element={<RegistrationSuccess />} />
-                {/* Backward/typo-friendly alias (one 's') */}
                 <Route
                     path="registration-succes"
                     element={<Navigate to="/registration-success" replace />}
