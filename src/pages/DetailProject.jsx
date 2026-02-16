@@ -63,7 +63,6 @@ function DetailProject() {
         }
     }, [projectData]);
 
-    // Skeleton loading state
     if (loading) {
         return (
             <BackgroundLayout>
@@ -134,6 +133,7 @@ function DetailProject() {
                                     title={projectData?.title}
                                     description={projectData?.description}
                                     showTitleAndDescription={true}
+                                    creator={projectData?.creator}
                                 />
                             </div>
                         )}

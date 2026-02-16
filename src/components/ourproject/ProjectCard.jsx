@@ -2,21 +2,17 @@ import React from 'react'
 import { getAvatarImageUrl } from '../../api/api'
 
 export default function ProjectCard({ project, onViewDetail, maxDescriptionWords = 50 }) {
-  // Gabungkan creator + contributors untuk ditampilkan di avatar stack
   const membersList = []
   if (project.creator) membersList.push({ ...project.creator, isCreator: true })
   if (project.contributors && project.contributors.length > 0) {
-    // Pastikan tidak duplikat (creator mungkin juga ada di contributors)
     const contribs = project.contributors.filter((c) => {
       if (!project.creator) return true
-      // Cek beberapa kemungkinan key untuk id/hashed id
       const contribId = c.id || c.hashed_id || c.hashedId || null
       const creatorId = project.creator.id || project.creator.hashed_id || project.creator.hashedId || null
       return contribId !== creatorId
     })
     membersList.push(...contribs)
   }
-  // Helper function untuk get status style
   const getStatusStyles = (status) => {
     if (status === 'In Progress') {
       return 'bg-red-500'
@@ -24,10 +20,11 @@ export default function ProjectCard({ project, onViewDetail, maxDescriptionWords
     return 'bg-green-500'
   }
 
-  // Konfigurasi: berapa avatar yang ditampilkan di stack
   const maxAvatars = 2
 
-  // Helper: truncate description safely by sentences (fallback ke kata jika perlu)
+  const contributors = project.contributors || []
+  const avatarSource = contributors.length > 0 ? contributors : membersList
+
   const truncateDescription = (raw) => {
     const plain = (raw || '').replace(/<\/?[^>]+(>|$)/g, '').trim()
     if (!plain) return ''
@@ -41,7 +38,6 @@ export default function ProjectCard({ project, onViewDetail, maxDescriptionWords
         total += w
       } else {
         if (total === 0) {
-          // first sentence too long -> fallback ke pemotongan kata
           const words = s.trim().split(/\s+/).slice(0, maxDescriptionWords).join(' ')
           return words + '...'
         }
@@ -107,9 +103,8 @@ export default function ProjectCard({ project, onViewDetail, maxDescriptionWords
           <div className="flex items-center gap-2">
             {/* Avatar Stack */}
             <div className="flex -space-x-2">
-              {membersList.length > 0 ? (
-                // Tampilkan maksimal `maxAvatars` avatars (creator + contributors)
-                membersList.slice(0, maxAvatars).map((member, idx) => (
+              {avatarSource.length > 0 ? (
+                avatarSource.slice(0, maxAvatars).map((member, idx) => (
                   <div
                     key={idx}
                     className="relative w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 border-2 border-gray-900 flex items-center justify-center text-white text-xs font-bold hover:z-10 transition"
@@ -129,16 +124,16 @@ export default function ProjectCard({ project, onViewDetail, maxDescriptionWords
                 ))
               ) : null}
 
-              {membersList.length > maxAvatars ? (
+              {avatarSource.length > maxAvatars ? (
                 <div className="w-7 h-7 rounded-full bg-gray-700 border-2 border-gray-900 flex items-center justify-center text-gray-300 text-xs font-bold">
-                  +{membersList.length - maxAvatars}
+                  +{avatarSource.length - maxAvatars}
                 </div>
               ) : null}
             </div>
 
             {/* Member Count Text */}
             <span className="text-gray-400 text-xs font-medium whitespace-nowrap">
-              {project.team_members || 0} Members
+              {contributors.length > 0 ? contributors.length : (project.team_members || membersList.length || 0)} Members
             </span>
           </div>
 

@@ -14,8 +14,7 @@ export default function OurProject() {
     { label: 'Home', href: '/' },
     { label: 'About', href: '#about' },
     { label: 'Contact', href: '#contact' },
-    { label: 'People', href: '/people' },
-    { label: 'Project', href: '#project' }
+    { label: 'People', href: '/people' }
   ]
 
   const [projects, setProjects] = useState([])
