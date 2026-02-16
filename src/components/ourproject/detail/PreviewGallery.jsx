@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, FreeMode, Pagination, Thumbs } from 'swiper/modules';
 import 'swiper/css';
@@ -7,7 +8,8 @@ import 'swiper/css/free-mode';
 import 'swiper/css/thumbs';
 import { getProjectPreviewImageUrl } from '../../../api/api';
 
-const PreviewGallery = ({ previews = [], title, description, showTitleAndDescription = false }) => {
+const PreviewGallery = ({ previews = [], title, description, showTitleAndDescription = false, creator = null }) => {
+    const navigate = useNavigate();
     const [thumbsSwiper, setThumbsSwiper] = React.useState(null);
 
     if (!previews || previews.length === 0) return null;
@@ -105,9 +107,19 @@ const PreviewGallery = ({ previews = [], title, description, showTitleAndDescrip
             {showTitleAndDescription && (title || description) && (
                 <div className="bg-brand-fill border border-brand-stroke rounded-3xl p-6 md:p-8 shadow-2xl">
                     {title && (
-                        <h2 className="text-2xl md:text-3xl font-bold text-pure-white font-inter mb-4">
-                            {title}
-                        </h2>
+                        <>
+                            <h2 className="text-2xl md:text-3xl font-bold text-pure-white font-inter mb-2">
+                                {title}
+                            </h2>
+
+                            {/* Created by line - placed directly under title */}
+                            {creator && (
+                                <div className="mb-3 flex items-center gap-1">
+                                    <span className="text-xs text-gray-400 uppercase">Created By</span>
+                                    <span className="text-xs text-green-400 font-medium uppercase">{creator.name}</span>
+                                </div>
+                            )}
+                        </>
                     )}
 
                     {description && (
