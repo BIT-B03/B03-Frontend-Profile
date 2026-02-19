@@ -42,7 +42,7 @@ const ProfileCard = ({ avatarUrl, name, email, position, generation, bio, loadin
     }
 
     return (
-        <div className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-start gap-4 md:gap-10">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-center md:justify-start gap-4 md:gap-10">
             {/* Avatar image */}
             <div className={`relative w-60 sm:w-56 md:w-80 flex-shrink-0 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 ${!isLoaded ? 'skeleton-base skeleton-shimmer' : ''}`}>
                 <ImageWithSkeleton
@@ -60,39 +60,41 @@ const ProfileCard = ({ avatarUrl, name, email, position, generation, bio, loadin
             </div>
 
             {/* Profile info — centered vertically next to the avatar */}
-            <div className="flex-1 flex flex-col items-center md:items-start gap-4 text-center md:text-left">
-                {/* Name */}
-                <h1 className="pb-3 font-bold text-4xl sm:text-5xl md:text-5xl lg:text-7xl tracking-tight leading-tight font-inter bg-gradient-to-r from-white via-white/100 to-brand-24e1c9/70 text-transparent bg-clip-text">
-                    {name}
-                </h1>
+            <div className="flex flex-col items-start md:items-start gap-4 md:gap-0 w-full max-w-full md:self-stretch md:justify-between">
+                <div className="flex flex-col items-baseline md:items-start gap-4 w-full max-w-full">
+                    {/* Name */}
+                    <h1 className="pb-3 font-bold text-4xl sm:text-5xl md:text-5xl lg:text-7xl tracking-tight leading-tight font-inter bg-gradient-to-r from-white via-white/100 to-brand-24e1c9/70 text-transparent bg-clip-text">
+                        {name}
+                    </h1>
 
-                {/* Badges */}
-                <div className="mb-2 md:mb-4 flex flex-wrap items-center gap-2 justify-center md:justify-start">
-                    {generationLabel && (
-                        <span className={`px-3 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm md:px-3 md:py-1 md:text-xs lg:px-4 lg:py-2 lg:text-sm font-bold tracking-widest rounded-full border ${generationBadgeStyles} uppercase`}>
-                            {generationLabel}
-                        </span>
+                    {/* Badges */}
+                    <div className="mb-2 md:mb-4 flex flex-wrap items-center gap-2 justify-center md:justify-start">
+                        {generationLabel && (
+                            <span className={`px-3 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm md:px-3 md:py-1 md:text-xs lg:px-4 lg:py-2 lg:text-sm font-bold tracking-widest rounded-full border ${generationBadgeStyles} uppercase`}>
+                                {generationLabel}
+                            </span>
+                        )}
+                        {positionLabel && (
+                            <span className={`px-3 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm md:px-3 md:py-1 md:text-xs lg:px-4 lg:py-2 lg:text-sm font-bold tracking-widest rounded-full border ${badgeStyles} uppercase`}>
+                                {positionLabel}
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Email */}
+                    {email && (
+                        <div className="flex items-center gap-3 text-pure-white/80 text-sm sm:text-base md:text-sm lg:text-base px-4 py-2 md:px-3 md:py-1 lg:px-4 lg:py-2 rounded-[10px] border border-white/10 bg-white/5">
+                            <img src="/svg/email.svg" alt="email" className="w-6 h-6 flex-shrink-0" />
+                            <span className="pb-0.5 font-medium tracking-wide">{email}</span>
+                        </div>
                     )}
-                    {positionLabel && (
-                        <span className={`px-3 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm md:px-3 md:py-1 md:text-xs lg:px-4 lg:py-2 lg:text-sm font-bold tracking-widest rounded-full border ${badgeStyles} uppercase`}>
-                            {positionLabel}
-                        </span>
+
+                    {bio && (
+                        <div className="w-full pt-10">
+                            <BioSection bio={bio} className="mt-0" />
+                        </div>
                     )}
                 </div>
-
-                {/* Email */}
-                {email && (
-                    <div className="flex items-center gap-3 text-pure-white/80 text-sm sm:text-base md:text-sm lg:text-base px-4 py-2 md:px-3 md:py-1 lg:px-4 lg:py-2 rounded-[10px] border border-white/10 bg-white/5">
-                        <img src="/svg/email.svg" alt="email" className="w-6 h-6 flex-shrink-0" />
-                        <span className="pb-0.5 font-medium tracking-wide">{email}</span>
-                    </div>
-                )}
-
-                {bio && (
-                    <div className="w-full mt-4">
-                        <BioSection bio={bio} className="mt-0" />
-                    </div>
-                )}
             </div>
         </div>
     );

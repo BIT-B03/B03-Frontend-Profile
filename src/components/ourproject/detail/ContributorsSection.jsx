@@ -51,4 +51,3 @@ const ContributorsSection = ({ contributors = [] }) => {
 };
 
 export default ContributorsSection;
- 
