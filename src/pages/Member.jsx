@@ -6,7 +6,6 @@ import Navbar from '../components/Navbar';
 import { sortMembers } from '../utils/members';
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getCachedData, setCachedData } from '../utils/cache';
 import MemberCard from '../components/member/common/MemberCard';
 import TitleSection from '../components/member/common/TitleSection';
 import Filters from '../components/member/common/MemberFilters';
@@ -45,27 +44,14 @@ const MemberPageContent = () => {
         setGenerations(uniqueGens);
     };
 
-    // Cache
-    const fetchUsers = async ({ useCache = true } = {}) => {
-        const cacheKey = 'members:list';
-        let cached = null;
-
+    const fetchUsers = async () => {
         try {
             setLoading(true);
-
-            if (useCache) {
-                cached = getCachedData(cacheKey);
-                if (cached) {
-                    hydrateStateFromUsers(cached);
-                    setError(null);
-                }
-            }
 
             const response = await getAllUsers();
             const users = response.data;
             hydrateStateFromUsers(users);
             setError(null);
-            setCachedData(cacheKey, users);
         } catch (err) {
             setError('Failed to load users data');
             console.error(err);
@@ -117,7 +103,7 @@ const MemberPageContent = () => {
             )}
 
             {!loading && error && (
-                <ErrorBanner message={error} onRetry={() => fetchUsers({ useCache: false })} />
+                <ErrorBanner message={error} onRetry={() => fetchUsers()} />
             )}
 
             {!error && filteredUsers.length > 0 && (

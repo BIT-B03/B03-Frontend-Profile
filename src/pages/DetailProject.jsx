@@ -7,7 +7,6 @@ import ProjectHeader from '../components/ourproject/detail/ProjectHeader';
 import ContributorsSection from '../components/ourproject/detail/ContributorsSection';
 import PreviewGallery from '../components/ourproject/detail/PreviewGallery';
 import BackgroundLayout from '../components/layout/GuestMemberBackground';
-import { getCachedData, setCachedData } from '../utils/cache';
 
 function DetailProject() {
     const navItems = [
@@ -23,28 +22,15 @@ function DetailProject() {
     const navigate = useNavigate();
     const projectId = projectHashedId;
 
-    const fetchProjectData = useCallback(async ({ useCache = true } = {}) => {
+    const fetchProjectData = useCallback(async () => {
         try {
             setLoading(true);
-
-            const cacheKey = `project:detail:${projectId}`;
-
-            if (useCache) {
-                const cached = getCachedData(cacheKey);
-                if (cached) {
-                    setProjectData(cached);
-                    setError(null);
-                    setLoading(false);
-                    return;
-                }
-            }
 
             const response = await getProjectPublicData(projectId);
             const data = response.data;
 
             setProjectData(data);
             setError(null);
-            setCachedData(cacheKey, data);
         } catch (err) {
             setError('Failed to load project data');
             console.error(err);
@@ -99,7 +85,7 @@ function DetailProject() {
                         <div className="flex gap-2">
                             <button
                                 type="button"
-                                onClick={() => fetchProjectData({ useCache: false })}
+                                onClick={() => fetchProjectData()}
                                 className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-pure-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
                             >
                                 Retry
@@ -128,7 +114,7 @@ function DetailProject() {
 
                         {projectData?.preview && projectData.preview.length > 0 && (
                             <div>
-                                <PreviewGallery 
+                                <PreviewGallery
                                     previews={projectData.preview}
                                     title={projectData?.title}
                                     description={projectData?.description}

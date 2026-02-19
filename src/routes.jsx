@@ -1,6 +1,7 @@
 import './styles/index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import App from './pages/app.jsx';
@@ -17,28 +18,32 @@ import ErrorHandlerPage from './pages/ErrorHandlerPage.jsx';
 import NotFoundRedirect from './pages/NotFoundRedirect.jsx';
 import ProtectedRoute from './utils/ProtectRoute';
 
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <Router>
-            <Routes>
-                <Route path="/" element={<App />} />
-                <Route path="dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
-                <Route path="people" element={<Member />} />
-                <Route path="people/:userHashedId" element={<DetailMember />} />
-                <Route path="register" element={<Register />} />
-                <Route path="login" element={<LoginPage />} />
-                <Route path="project" element={<OurProject />} />
-                <Route path="projects/:projectHashedId" element={<DetailProject />} />
-                <Route path="reset-password" element={<ResetPasswordPage />} />
-                <Route path="forgot-password" element={<Navigate to="/reset-password" replace />} />
-                <Route path="error" element={<ErrorHandlerPage />} />
-                <Route path="registration-success" element={<RegistrationSuccess />} />
-                <Route
-                    path="registration-succes"
-                    element={<Navigate to="/registration-success" replace />}
-                />
-                <Route path="*" element={<NotFoundRedirect />} />
-            </Routes>
-        </Router>
+        <QueryClientProvider client={queryClient}>
+            <Router>
+                <Routes>
+                    <Route path="/" element={<App />} />
+                    <Route path="dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
+                    <Route path="people" element={<Member />} />
+                    <Route path="people/:userHashedId" element={<DetailMember />} />
+                    <Route path="register" element={<Register />} />
+                    <Route path="login" element={<LoginPage />} />
+                    <Route path="project" element={<OurProject />} />
+                    <Route path="projects/:projectHashedId" element={<DetailProject />} />
+                    <Route path="reset-password" element={<ResetPasswordPage />} />
+                    <Route path="forgot-password" element={<Navigate to="/reset-password" replace />} />
+                    <Route path="error" element={<ErrorHandlerPage />} />
+                    <Route path="registration-success" element={<RegistrationSuccess />} />
+                    <Route
+                        path="registration-succes"
+                        element={<Navigate to="/registration-success" replace />}
+                    />
+                    <Route path="*" element={<NotFoundRedirect />} />
+                </Routes>
+            </Router>
+        </QueryClientProvider>
     </React.StrictMode>
 );
