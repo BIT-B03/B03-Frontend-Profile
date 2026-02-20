@@ -6,6 +6,7 @@ import StatisticCard from '../components/Dashboard/StatisticCard';
 import StatistikChart from '../components/Dashboard/StatistikChart';
 import RecentProject from '../components/Dashboard/RecentProject';
 import DashboardLoading from '../components/Dashboard/DashboardLoading';
+import DashboardNoContent from '../components/Dashboard/DashboardNoContent';
 import { GetMyStatistics, SetAuthToken } from '../api/api';
 import { toErrorPageState } from '../utils/errorState';
 
@@ -127,10 +128,7 @@ export default function Dashboard() {
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-              <div className="text-pure-white font-semibold">Belum ada statistik</div>
-              <div className="text-sm text-muted-gray mt-1">Data statistik untuk akun ini masih kosong.</div>
-            </div>
+            <DashboardNoContent />
           )}
         </div>
       </main>

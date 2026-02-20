@@ -104,6 +104,16 @@ export const getAvatarImageUrl = (filename) => {
     return `/api/userPublic/avatars/${safe}`;
 };
 
+// Fetch current authenticated user's profile
+export const GetMyProfile = async () => {
+    try {
+        const response = await API.get('/auth/me');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Fetch dashboard statistics for current (authenticated) user
 export const GetMyStatistics = async () => {
     const response = await API.get('/statistik/me');
