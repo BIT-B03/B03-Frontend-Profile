@@ -131,7 +131,6 @@ export const GetMyProfile = async () => {
         const response = await API.get('/auth/me');
         return response.data;
     } catch (error) {
-        console.error("Error fetching profile data:", error);
         throw error;
     }
 };
