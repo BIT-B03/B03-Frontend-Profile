@@ -1,5 +1,6 @@
 import React from 'react'
 import { getAvatarImageUrl } from '../../api/api'
+import { getProjectStatusMeta } from '../../utils/projectStatus'
 
 export default function ProjectCard({ project, onViewDetail, maxDescriptionWords = 50 }) {
   const membersList = []
@@ -13,12 +14,7 @@ export default function ProjectCard({ project, onViewDetail, maxDescriptionWords
     })
     membersList.push(...contribs)
   }
-  const getStatusStyles = (status) => {
-    if (status === 'In Progress') {
-      return 'bg-red-500'
-    }
-    return 'bg-green-500'
-  }
+  const statusMeta = getProjectStatusMeta(project.status)
 
   const maxAvatars = 2
 
@@ -76,8 +72,8 @@ export default function ProjectCard({ project, onViewDetail, maxDescriptionWords
 
         {/* Status Badge */}
         <div className="absolute top-3 right-3">
-          <span className={`px-3 py-1 rounded-full text-xs font-bold text-white ${getStatusStyles(project.status)}`}>
-            {project.status}
+          <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusMeta.badgeClass}`}>
+            {statusMeta.label}
           </span>
         </div>
       </div>

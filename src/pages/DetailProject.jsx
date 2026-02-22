@@ -4,9 +4,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getProjectPublicData } from '../api/api';
 import React, { useState, useEffect, useCallback } from 'react';
 import ProjectHeader from '../components/ourproject/detail/ProjectHeader';
+import { getProjectStatusMeta } from '../utils/projectStatus';
 import ContributorsSection from '../components/ourproject/detail/ContributorsSection';
 import PreviewGallery from '../components/ourproject/detail/PreviewGallery';
 import BackgroundLayout from '../components/layout/GuestMemberBackground';
+// cache utilities removed — cache logic deleted from this page
 
 function DetailProject() {
     const navItems = [
@@ -27,9 +29,32 @@ function DetailProject() {
             setLoading(true);
 
             const response = await getProjectPublicData(projectId);
-            const data = response.data;
 
-            setProjectData(data);
+            // normalize: API may return { data: { ...project } } or project object directly
+            let project = response;
+            if (response && response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+                project = response.data;
+            }
+
+            // Debug: log project shape when status is missing
+            // eslint-disable-next-line no-console
+            if (!project || (project && typeof project.status === 'undefined')) {
+                // small debug to inspect why status may be absent
+                // print full JSON string so it's easy to copy/paste here
+                try {
+                    // eslint-disable-next-line no-console
+                    console.debug('DetailProject: fetched project (status missing or undefined) JSON:\n', JSON.stringify(project, null, 2));
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.debug('DetailProject: fetched project (status missing or undefined)', project);
+                }
+            }
+
+            // Ensure UI-consistent status metadata so header/card match
+            const statusMeta = getProjectStatusMeta(project?.status || project?.project_status || project?.state || project);
+            const normalized = { ...project, status: statusMeta.label, statusTone: statusMeta.tone };
+
+            setProjectData(normalized);
             setError(null);
         } catch (err) {
             setError('Failed to load project data');
@@ -114,7 +139,7 @@ function DetailProject() {
 
                         {projectData?.preview && projectData.preview.length > 0 && (
                             <div>
-                                <PreviewGallery
+                                <PreviewGallery 
                                     previews={projectData.preview}
                                     title={projectData?.title}
                                     description={projectData?.description}

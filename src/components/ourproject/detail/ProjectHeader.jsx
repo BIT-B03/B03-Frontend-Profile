@@ -1,28 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAvatarImageUrl } from '../../../api/api';
+import { getProjectStatusMeta } from '../../../utils/projectStatus';
 import ArrowIcon from '../../../assets/arrow.svg';
-import PanahIcon from '../../../assets/panah.svg';
 
 const ProjectHeader = ({ title, status, creator }) => {
     const navigate = useNavigate();
-
-    const getStatusColor = (status) => {
-        if (status?.toLowerCase().includes('progress')) {
-            return 'bg-red-500 text-pure-white';
-        }
-        return 'bg-green-500 text-pure-white';
-    };
-
-    const getStatusLabel = (status) => {
-        if (status?.toLowerCase().includes('progress')) {
-            return 'On Progress';
-        }
-        return 'Completed';
-    };
+    const statusMeta = getProjectStatusMeta(status);
 
     const ownerFirstName = creator?.name ? String(creator.name).trim().split(/\s+/)[0] : null
     const displayTitle = ownerFirstName ? `${ownerFirstName} Project` : title
+
+    if (statusMeta.tone === 'unknown') {
+        // debug help: log only when we couldn't determine status
+        // keep this conditional log small and safe for prod debugging
+        // remove or change to a proper logger once the issue is resolved
+        // eslint-disable-next-line no-console
+        console.debug('ProjectHeader: unresolved status', { status, statusMeta, creator });
+    }
 
     return (
         <div className="bg-brand-fill border border-brand-stroke rounded-3xl px-4 sm:px-6 py-2 sm:py-4 flex items-center gap-1 sm:gap-4 mt-5">
@@ -53,8 +48,8 @@ const ProjectHeader = ({ title, status, creator }) => {
                 </h1>
 
                 {/* Status Badge - Next to Title */}
-                <span className={`ml-2 flex-shrink-0 px-1 md:px-3 py-0.5 rounded-full text-[11px] md:text-sm font-bold whitespace-nowrap ${getStatusColor(status)}`}>
-                    {getStatusLabel(status)}
+                <span className={`ml-2 flex-shrink-0 px-1 md:px-3 py-0.5 rounded-full text-[11px] md:text-sm font-bold whitespace-nowrap ${statusMeta.badgeClass}`}>
+                    {statusMeta.label}
                 </span>
             </div>
 
