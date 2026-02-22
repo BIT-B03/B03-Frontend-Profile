@@ -7,6 +7,7 @@ import StatsSection from '../components/ourproject/StatsSection'
 import FilterSearch from '../components/ourproject/FilterSearch'
 import ProjectsGrid from '../components/ourproject/ProjectsGrid'
 import axios from 'axios'
+import { getProjectStatusMeta } from '../utils/projectStatus'
 
 export default function OurProject() {
   const navigate = useNavigate()
@@ -70,20 +71,15 @@ export default function OurProject() {
 
         // normalize to shape used by UI
         const mapped = items.map((p, idx) => {
-          const raw = String(p.status || '').toLowerCase()
-          let normalizedStatus = p.status || ''
-          if (raw === 'on_progress' || raw === 'in_progress' || raw.includes('progress')) {
-            normalizedStatus = 'In Progress'
-          } else if (raw === 'complete' || raw === 'completed' || raw.includes('complete')) {
-            normalizedStatus = 'Complete'
-          }
+          const statusMeta = getProjectStatusMeta(p.status)
 
           return {
             id: p.id || idx,
             id_hash: p.hashed_id || p.id_hash || '',
             title: p.title || p.name || 'Untitled',
             description: p.short_description || p.description || '',
-            status: normalizedStatus,
+            status: statusMeta.label,
+            statusTone: statusMeta.tone,
             thumbnail_url: p.thumbnail || p.thumbnail_url || '',
             // Sertakan creator dari backend jika ada
             creator: p.creator || null,
@@ -113,9 +109,9 @@ export default function OurProject() {
 
     // Apply filter by status
     if (activeFilter === 'progress') {
-      filtered = filtered.filter(p => String(p.status || '').toLowerCase().includes('progress'))
+      filtered = filtered.filter(p => p.statusTone === 'progress')
     } else if (activeFilter === 'complete') {
-      filtered = filtered.filter(p => String(p.status || '').toLowerCase().includes('complete'))
+      filtered = filtered.filter(p => p.statusTone === 'complete')
     }
 
     // Apply search query
@@ -132,16 +128,8 @@ export default function OurProject() {
   // Hitung statistik
   const stats = {
     total: projects.length,
-    progress: projects.filter(p => String(p.status || '').toLowerCase().includes('progress')).length,
-    complete: projects.filter(p => String(p.status || '').toLowerCase().includes('complete')).length
-  }
-
-  // Helper function untuk get status style
-  const getStatusStyles = (status) => {
-    if (status === 'In Progress') {
-      return 'bg-red-500'
-    }
-    return 'bg-green-500'
+    progress: projects.filter(p => p.statusTone === 'progress').length,
+    complete: projects.filter(p => p.statusTone === 'complete').length
   }
 
   // Handle navigate to detail
@@ -150,11 +138,11 @@ export default function OurProject() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-black to-black text-white">
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-black to-black text-white overflow-x-hidden">
       <Navbar navItems={navItems} />
 
       {/* Hero Section */}
-      <section className="relative pb-0 md:pb-40">
+      <section className="relative pb-10 md:pb-20">
         <div className="max-w-5xl mx-auto px-6 py-16 text-center relative z-10 pt-28">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Project</h1>
           <p className="text-gray-400 max-w-2xl mx-auto mb-8">
@@ -162,11 +150,11 @@ export default function OurProject() {
             is built with robust architecture, high data security, and stable performance.
           </p>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 flex justify-center w-full pointer-events-none overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center w-full pointer-events-none z-0">
           <img
             src={GlowSvg}
             alt="glow"
-            className="w-screen h-auto opacity-80 transform scale-150 md:scale-100 origin-bottom translate-y-8 md:translate-y-0"
+            className="w-screen h-auto opacity-80 transform scale-150 md:scale-100 origin-bottom -translate-y-12 md:translate-y-8"
           />
         </div>
       </section>

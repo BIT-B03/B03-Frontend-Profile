@@ -2,6 +2,7 @@ import React from 'react';
 import GitIcon from '../../../assets/Git.svg';
 import RectIcon from '../../../assets/rectangle.svg';
 import MemberCard from '../../member/common/MemberCard';
+import { GRID_CLASSES } from '../../member/common/ImageWithSkeleton';
 
 const ContributorsSection = ({ contributors = [] }) => {
     if (!contributors || contributors.length === 0) {
@@ -29,7 +30,7 @@ const ContributorsSection = ({ contributors = [] }) => {
                     </div>
                 </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className={GRID_CLASSES}>
                 {contributors.map((contributor, idx) => {
                     const memberData = {
                         ...contributor,
@@ -39,7 +40,7 @@ const ContributorsSection = ({ contributors = [] }) => {
 
                     return (
                         <div key={contributor.id || idx} className="w-full">
-                            <div className="aspect-[2/3] w-full">
+                            <div className="aspect-[4/6] w-full">
                                 <MemberCard member={memberData} />
                             </div>
                         </div>
@@ -51,3 +52,4 @@ const ContributorsSection = ({ contributors = [] }) => {
 };
 
 export default ContributorsSection;
+ 
