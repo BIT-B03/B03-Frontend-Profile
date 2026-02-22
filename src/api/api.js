@@ -17,6 +17,27 @@ export const ClearAuthToken = () => {
     delete API.defaults.headers.common["Authorization"];
 };
 
+API.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const status = error?.response?.status;
+
+        if (status === 401) {
+            localStorage.removeItem("auth_access_token");
+            localStorage.removeItem("username");
+            localStorage.removeItem("position");
+            localStorage.removeItem("role");
+
+            ClearAuthToken();
+            if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+                window.location.replace("/error");
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 export const Login = async (payload) => {
     // payload: { username, password }
     try {
@@ -142,6 +163,14 @@ export const getProjectThumbnailImageUrl = (filename) => {
     if (!filename) return null;
     const safe = filename.startsWith('/') ? filename.slice(1) : filename;
     return `/api/projectPublic/thumbnails/${safe}`;
+};
+
+export const createKickRequest = async (userHashedId, reason) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.post(
+        `/admin/kick-requests/${userHashedId}`, { reason },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    ); return response.data;
 };
 
 export default API;
