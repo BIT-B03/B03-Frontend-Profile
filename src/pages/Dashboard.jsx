@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import useSidebarCollapsed from '../hooks/useSidebarCollapsed';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
@@ -11,7 +12,7 @@ import { GetMyStatistics, SetAuthToken } from '../api/api';
 import { toErrorPageState } from '../utils/errorState';
 
 export default function Dashboard() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useSidebarCollapsed();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [statsPayload, setStatsPayload] = useState(null);

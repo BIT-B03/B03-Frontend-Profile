@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import useSidebarCollapsed from '../hooks/useSidebarCollapsed';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
 import GuestMemberBackground from '../components/layout/GuestMemberBackground';
@@ -13,7 +14,7 @@ import KickRequestModal from '../components/kick-request/KickRequestModal';
 import { useKickRequestModal } from '../hooks/useKickRequestModal';
 
 export default function CreateKickRequest() {
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useSidebarCollapsed();
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const [allUsers, setAllUsers] = useState([]);
     const [filteredMembers, setFilteredMembers] = useState([]);
