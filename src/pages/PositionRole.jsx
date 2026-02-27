@@ -1,42 +1,70 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import useSidebarCollapsed from '../hooks/useSidebarCollapsed';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
 import GuestMemberBackground from '../components/layout/GuestMemberBackground';
+import useSidebarCollapsed from '../hooks/useSidebarCollapsed';
 import EmptyState from '../components/filter/EmptyState';
+import MemberFilters from '../components/member/common/MemberFilters';
+import PositionRoleMemberCard from '../components/position-role/PositionRoleMemberCard';
+import PositionRoleModal from '../components/position-role/PositionRoleModal';
 import { getAdminMembers } from '../api/api';
 import { sortMembers } from '../utils/members';
-import useSelection from '../hooks/useSelectionKick';
-import MemberFilters from '../components/member/common/MemberFilters';
-import KickMemberCard from '../components/kick-request/KickMemberCard';
-import KickSelectionBar from '../components/kick-request/KickSelectionBar';
-import KickRequestModal from '../components/kick-request/KickRequestModal';
-import { useKickRequestModal } from '../hooks/useKickRequestModal';
+import { usePositionRoleUpdate } from '../hooks/usePositionRoleUpdate';
 
-export default function CreateKickRequest() {
+export default function PositionRole() {
     const [collapsed, setCollapsed] = useSidebarCollapsed();
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const [allUsers, setAllUsers] = useState([]);
     const [filteredMembers, setFilteredMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [activeMember, setActiveMember] = useState(null);
+    const [formState, setFormState] = useState({ position: '', role: '', generation: '' });
     const [activeFilter, setActiveFilter] = useState('all');
     const [selectedGeneration, setSelectedGeneration] = useState(null);
-    const { has, toggle, clear, count } = useSelection();
+    const { isSaving, saveMemberChanges } = usePositionRoleUpdate({
+        onSuccess: ({ member, payload }) => {
+            if (!member?.hashed_id) return;
 
-    const {
-        isOpen: isKickModalOpen,
-        reason,
-        setReason,
-        isSubmitting,
-        error: kickError,
-        targetMembers,
-        openModal: openKickModal,
-        closeModal: closeKickModal,
-        submitKickRequest,
-    } = useKickRequestModal({
-        onSuccess: () => {
-            clear();
+            setAllUsers((prev) =>
+                prev.map((m) => {
+                    if (m.hashed_id !== member.hashed_id) return m;
+                    const next = { ...m };
+
+                    if (payload?.position !== undefined) {
+                        next.position = payload.position;
+                    }
+                    if (payload?.new_role !== undefined) {
+                        next.role = payload.new_role;
+                    }
+                    if (payload?.generation !== undefined) {
+                        next.generation = payload.generation;
+                    }
+
+                    return next;
+                })
+            );
+
+            setFilteredMembers((prev) =>
+                prev.map((m) => {
+                    if (m.hashed_id !== member.hashed_id) return m;
+                    const next = { ...m };
+
+                    if (payload?.position !== undefined) {
+                        next.position = payload.position;
+                    }
+                    if (payload?.new_role !== undefined) {
+                        next.role = payload.new_role;
+                    }
+                    if (payload?.generation !== undefined) {
+                        next.generation = payload.generation;
+                    }
+
+                    return next;
+                })
+            );
+
+            setActiveMember(null);
         },
     });
 
@@ -88,10 +116,31 @@ export default function CreateKickRequest() {
         if (nextGen !== undefined) setSelectedGeneration(nextGen);
     }, []);
 
-    const handleOpenKickModal = () => {
-        const selectedList = allUsers.filter((member) => has(member.hashed_id));
-        if (selectedList.length === 0) return;
-        openKickModal(selectedList);
+    const handleOpenEdit = (member) => {
+        setActiveMember(member);
+        setFormState({
+            position: member?.position || '',
+            role: member?.role || member?.division || '',
+            generation:
+                member?.generation !== undefined && member?.generation !== null ? String(member.generation) : '',
+        });
+    };
+
+    const handleCloseModal = () => {
+        setActiveMember(null);
+    };
+
+    const handleChange = (field, value) => {
+        setFormState((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleSave = async () => {
+        if (!activeMember) return;
+        try {
+            await saveMemberChanges({ member: activeMember, formState });
+        } catch {
+            // Error handling is managed inside the hook; keep modal open on failure
+        }
     };
 
     return (
@@ -104,12 +153,11 @@ export default function CreateKickRequest() {
                 />
 
                 <main
-                    className={`relative flex-1 min-w-0 transition-all duration-300 ${collapsed ? 'lg:ml-20' : 'lg:ml-72'
-                        }`}
+                    className={`relative flex-1 min-w-0 transition-all duration-300 ${collapsed ? 'lg:ml-20' : 'lg:ml-72'}`}
                 >
-                    <div className="p-6 sm:p-8 pb-28">
+                    <div className="p-6 sm:p-8 pb-16">
                         <Header
-                            title="Create Kick Request"
+                            title="Position & Role"
                             onMobileMenuClick={() => setMobileSidebarOpen(true)}
                             onDesktopMenuClick={() => setCollapsed((v) => !v)}
                         />
@@ -142,11 +190,10 @@ export default function CreateKickRequest() {
                             {!loading && !error && filteredMembers.length > 0 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {filteredMembers.map((member) => (
-                                        <KickMemberCard
+                                        <PositionRoleMemberCard
                                             key={member.hashed_id}
                                             member={member}
-                                            selected={has(member.hashed_id)}
-                                            onToggle={() => toggle(member.hashed_id)}
+                                            onEdit={() => handleOpenEdit(member)}
                                         />
                                     ))}
                                 </div>
@@ -154,23 +201,14 @@ export default function CreateKickRequest() {
                         </section>
                     </div>
 
-                    {count > 0 && (
-                        <KickSelectionBar
-                            count={count}
-                            onCancel={clear}
-                            onConfirm={handleOpenKickModal}
-                        />
-                    )}
-
-                    <KickRequestModal
-                        isOpen={isKickModalOpen}
-                        onClose={closeKickModal}
-                        onConfirm={submitKickRequest}
-                        reason={reason}
-                        onReasonChange={setReason}
-                        count={targetMembers.length}
-                        isSubmitting={isSubmitting}
-                        error={kickError}
+                    <PositionRoleModal
+                        isOpen={Boolean(activeMember)}
+                        member={activeMember}
+                        formState={formState}
+                        onChange={handleChange}
+                        onClose={handleCloseModal}
+                        onSave={handleSave}
+                        isSaving={isSaving}
                     />
                 </main>
             </div>

@@ -165,12 +165,41 @@ export const getProjectThumbnailImageUrl = (filename) => {
     return `/api/projectPublic/thumbnails/${safe}`;
 };
 
+// ADMIN MEMBER
 export const createKickRequest = async (userHashedId, reason) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
     const response = await API.post(
         `/admin/kick-requests/${userHashedId}`, { reason },
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
     ); return response.data;
+};
+
+export const getAdminMembers = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.get(
+        '/admin/members',
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const getAdminMemberDetail = async (userHashedId) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.get(
+        `/admin/members/${userHashedId}`,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const updateAdminMember = async (userHashedId, payload) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.put(
+        `/admin/updateMember/${userHashedId}`,
+        payload,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
 };
 
 export default API;

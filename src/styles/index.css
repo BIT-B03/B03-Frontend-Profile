@@ -67,19 +67,33 @@ input[type='password']::-ms-clear {
 .sidebar-scrollbar {
     /* Firefox */
     scrollbar-width: thin;
-    scrollbar-color: rgba(36,225,201,0.16) transparent;
+    scrollbar-color: rgba(36, 225, 201, 0.16) transparent;
 }
+
 .sidebar-scrollbar::-webkit-scrollbar {
     width: 8px;
 }
+
 .sidebar-scrollbar::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .sidebar-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(36,225,201,0.14);
+    background: rgba(36, 225, 201, 0.14);
     border-radius: 999px;
-    border: 2px solid rgba(0,0,0,0.16);
+    border: 2px solid rgba(0, 0, 0, 0.16);
 }
+
 .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(36,225,201,0.26);
+    background: rgba(36, 225, 201, 0.26);
+}
+
+/* hide scrollbars */
+.scrollbar-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+    display: none;
 }
