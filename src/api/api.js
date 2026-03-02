@@ -215,6 +215,15 @@ export const getProjectAuthThumbnailUrl = (filename) => {
 };
 
 // ADMIN MEMBER
+export const getKickRequests = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.get(
+        '/admin/kick-requests',
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
 export const createKickRequest = async (userHashedId, reason) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
     const response = await API.post(
@@ -246,6 +255,16 @@ export const updateAdminMember = async (userHashedId, payload) => {
     const response = await API.put(
         `/admin/updateMember/${userHashedId}`,
         payload,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const approveKickRequest = async (kickHashId) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.put(
+        `/admin/kick-requests/approve/${kickHashId}`,
+        {},
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
     );
     return response.data;
