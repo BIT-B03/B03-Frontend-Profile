@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useSidebarCollapsed from '../hooks/useSidebarCollapsed';
-import { useLocation, useNavigate } from 'react-router-dom';
+import useDashboardData from '../hooks/useDashboardData';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
 import StatisticCard from '../components/Dashboard/StatisticCard';
@@ -8,22 +8,14 @@ import StatistikChart from '../components/Dashboard/StatistikChart';
 import RecentProject from '../components/Dashboard/RecentProject';
 import DashboardLoading from '../components/Dashboard/DashboardLoading';
 import DashboardNoContent from '../components/Dashboard/DashboardNoContent';
-import { GetMyStatistics, SetAuthToken } from '../api/api';
-import { toErrorPageState } from '../utils/errorState';
+
 
 export default function Dashboard() {
   const [collapsed, setCollapsed] = useSidebarCollapsed();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [statsPayload, setStatsPayload] = useState(null);
-
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const stats = useMemo(() => statsPayload?.data || null, [statsPayload]);
+  const { loading, stats } = useDashboardData();
 
   useEffect(() => {
-    // Lock body scroll when mobile sidebar drawer is open
     document.body.style.overflow = mobileSidebarOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
@@ -31,54 +23,7 @@ export default function Dashboard() {
   }, [mobileSidebarOpen]);
 
   useEffect(() => {
-    const token = localStorage.getItem('auth_access_token');
-    const role = (localStorage.getItem('role') || '').toString().toLowerCase();
-    if (!token) {
-      navigate('/login', { replace: true });
-      return;
-    }
-    SetAuthToken(token);
-
-    let cancelled = false;
-    const run = async () => {
-      try {
-        setLoading(true);
-        if (role === 'superuser') {
-          if (!cancelled) setStatsPayload(null);
-          return;
-        }
-        const res = await GetMyStatistics();
-        if (!cancelled) setStatsPayload(res);
-      } catch (err) {
-        if (cancelled) return;
-
-        const status = err?.response?.status;
-        if (status === 403) {
-          if (!cancelled) setStatsPayload(null);
-          return;
-        }
-        navigate('/error', {
-          replace: true,
-          state: toErrorPageState(err, {
-            context: 'Dashboard statistik',
-            from: location,
-            status,
-            primaryCta:
-              status === 401
-                ? { label: 'Login', to: '/login', replace: true }
-                : { label: 'Ke Beranda', to: '/', replace: true },
-          }),
-        });
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    run();
-    return () => {
-      cancelled = true;
-    };
-  }, [location, navigate]);
+  }, [mobileSidebarOpen]);
 
   return (
     <div className="flex min-h-screen bg-brand-vignette overflow-x-hidden">
