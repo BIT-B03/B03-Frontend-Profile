@@ -12,6 +12,7 @@ import KickMemberCard from '../components/kick-request/KickMemberCard';
 import KickSelectionBar from '../components/kick-request/KickSelectionBar';
 import KickRequestModal from '../components/kick-request/KickRequestModal';
 import { useKickRequestModal } from '../hooks/useKickRequestModal';
+import useKickRequestsData from '../hooks/useKickRequestsData';
 
 export default function CreateKickRequest() {
     const [collapsed, setCollapsed] = useSidebarCollapsed();
@@ -23,6 +24,7 @@ export default function CreateKickRequest() {
     const [activeFilter, setActiveFilter] = useState('all');
     const [selectedGeneration, setSelectedGeneration] = useState(null);
     const { has, toggle, clear, count } = useSelection();
+    const { requests: existingKickRequests, refetch: refetchKickRequests } = useKickRequestsData();
 
     const {
         isOpen: isKickModalOpen,
@@ -35,8 +37,10 @@ export default function CreateKickRequest() {
         closeModal: closeKickModal,
         submitKickRequest,
     } = useKickRequestModal({
+        existingRequests: existingKickRequests,
         onSuccess: () => {
             clear();
+            refetchKickRequests();
         },
     });
 
