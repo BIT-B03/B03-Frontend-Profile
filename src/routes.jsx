@@ -22,6 +22,7 @@ import CreateKickRequest from './pages/CreateKickRequest.jsx';
 import PositionRole from './pages/PositionRole.jsx';
 import CreateProject from './pages/CreateProject.jsx';
 import DetailProjectCreate from './pages/DetailProjectCreate.jsx';
+import Settings from './pages/Settings.jsx';
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path="member-management/kick-request" element={<ProtectedRoute> <KickRequests /> </ProtectedRoute>} />
                     <Route path="member-management/kick-request/create" element={<ProtectedRoute> <CreateKickRequest /> </ProtectedRoute>} />
                     <Route path="member-management/position-role" element={<ProtectedRoute> <PositionRole /> </ProtectedRoute>} />
+                    <Route path="settings" element={<ProtectedRoute> <Settings /> </ProtectedRoute>} />
                     <Route path="create-project" element={<ProtectedRoute> <CreateProject /> </ProtectedRoute>} />
                     <Route path="create-project/:projectHashedId" element={<ProtectedRoute> <DetailProjectCreate /> </ProtectedRoute>} />
                     <Route path="people" element={<Member />} />

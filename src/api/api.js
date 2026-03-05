@@ -214,6 +214,45 @@ export const getProjectAuthThumbnailUrl = (filename) => {
     return `/api/project/thumbnails/${safe}`;
 };
 
+// ADMIN SETTINGS
+export const getApplicantRetention = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.get(
+        '/admin/settings/pelamar-retention',
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const updateApplicantRetention = async (days) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.put(
+        '/admin/settings/pelamar-retention',
+        { days },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const getDefaultGeneration = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.get(
+        '/admin/settings/default-generation',
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const updateDefaultGeneration = async (generation) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.put(
+        '/admin/settings/default-generation',
+        { generation },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
 // ADMIN MEMBER
 export const getKickRequests = async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
