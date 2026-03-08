@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import useHeaderUser, { getPositionStyle } from '../../hooks/useHeaderUser';
+import { getAvatarImageUrl } from '../../api/api';
 
 const HamburgerIcon = ({ className = 'w-5 h-5' }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,7 +16,14 @@ export default function Header({
   onDesktopMenuClick,
 }) {
   const navigate = useNavigate();
-  const { username, position } = useHeaderUser();
+  const { username, position, avatarUrl } = useHeaderUser();
+  const resolvedAvatar = React.useMemo(() => {
+    if (!avatarUrl) return null;
+    if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://') || avatarUrl.startsWith('/')) {
+      return avatarUrl;
+    }
+    return getAvatarImageUrl(avatarUrl);
+  }, [avatarUrl]);
 
   return (
     <header className="relative rounded-xl px-6 py-4 mb-6 overflow-hidden">
@@ -80,7 +88,7 @@ export default function Header({
           {/* Avatar */}
           <button
             onClick={() => navigate('/profile')}
-            className="relative shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-200 group"
+            className="relative shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-200 group overflow-hidden"
             style={{
               background: 'linear-gradient(135deg, rgba(36,225,201,0.25) 0%, rgba(31,76,116,0.5) 100%)',
               border: '1.5px solid rgba(36,225,201,0.35)',
@@ -92,7 +100,11 @@ export default function Header({
               className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
               style={{ boxShadow: '0 0 0 3px rgba(36,225,201,0.15), 0 0 16px rgba(36,225,201,0.25)' }}
             />
-            {username.charAt(0).toUpperCase()}
+            {resolvedAvatar ? (
+              <img src={resolvedAvatar} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              username.charAt(0).toUpperCase()
+            )}
           </button>
         </div>
       </div>

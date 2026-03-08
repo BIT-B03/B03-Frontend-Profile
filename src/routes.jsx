@@ -19,6 +19,7 @@ import NotFoundRedirect from './pages/NotFoundRedirect.jsx';
 import ProtectedRoute from './utils/ProtectRoute';
 import CreateKickRequest from './pages/CreateKickRequest.jsx';
 import PositionRole from './pages/PositionRole.jsx';
+import Profile from './pages/Profile.jsx';
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path="dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
                     <Route path="member-management/kick-request/create" element={<ProtectedRoute> <CreateKickRequest /> </ProtectedRoute>} />
                     <Route path="member-management/position-role" element={<ProtectedRoute> <PositionRole /> </ProtectedRoute>} />
+                    <Route path="profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
                     <Route path="people" element={<Member />} />
                     <Route path="people/:userHashedId" element={<DetailMember />} />
                     <Route path="register" element={<Register />} />
