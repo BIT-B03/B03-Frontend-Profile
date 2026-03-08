@@ -3,10 +3,12 @@ import Navbar from '../components/Navbar';
 import { useParams } from 'react-router-dom';
 import React from 'react';
 import useUserPublicData from '../hooks/useUserDetailPublic';
+import useUserContributedProjects from '../hooks/useUserContributedProjects';
 import ProfileCard from '../components/member/detail/ProfileCard';
 import BackgroundLayout from '../components/layout/GuestMemberBackground';
 import DescriptionSection from '../components/member/detail/DescriptionSection';
 import SocialLinks from '../components/member/detail/SocialLinks';
+import MemberProjectsSection from '../components/member/detail/MemberProjectsSection';
 import ErrorBanner from '../components/ErrorHendler/member/ErrorBanner';
 
 function App() {
@@ -19,6 +21,7 @@ function App() {
     const userId = userHashedId;
 
     const { userData, loading, error, refetch } = useUserPublicData(userId);
+    const { projects: contributedProjects, loading: projectsLoading, error: projectsError } = useUserContributedProjects(userId);
 
     if (loading) {
         return (
@@ -72,6 +75,15 @@ function App() {
 
                             <SocialLinks sosmed={userData?.sosmed} className="pt-2" />
                         </div>
+
+                        {/* Divider */}
+                        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                        <MemberProjectsSection
+                            projects={contributedProjects}
+                            loading={projectsLoading}
+                            error={projectsError}
+                        />
                     </div>
                 )}
             </main>

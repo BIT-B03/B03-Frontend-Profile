@@ -17,10 +17,13 @@ import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import ErrorHandlerPage from './pages/ErrorHandlerPage.jsx';
 import NotFoundRedirect from './pages/NotFoundRedirect.jsx';
 import ProtectedRoute from './utils/ProtectRoute';
+import KickRequests from './pages/KickRequests.jsx';
 import CreateKickRequest from './pages/CreateKickRequest.jsx';
 import PositionRole from './pages/PositionRole.jsx';
 import Profile from './pages/Profile.jsx';
-
+import CreateProject from './pages/CreateProject.jsx';
+import DetailProjectCreate from './pages/DetailProjectCreate.jsx';
+import Settings from './pages/Settings.jsx';
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -30,9 +33,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Routes>
                     <Route path="/" element={<App />} />
                     <Route path="dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
+                    <Route path="member-management/kick-request" element={<ProtectedRoute> <KickRequests /> </ProtectedRoute>} />
                     <Route path="member-management/kick-request/create" element={<ProtectedRoute> <CreateKickRequest /> </ProtectedRoute>} />
                     <Route path="member-management/position-role" element={<ProtectedRoute> <PositionRole /> </ProtectedRoute>} />
                     <Route path="profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
+                    <Route path="settings" element={<ProtectedRoute> <Settings /> </ProtectedRoute>} />
+                    <Route path="create-project" element={<ProtectedRoute> <CreateProject /> </ProtectedRoute>} />
+                    <Route path="create-project/:projectHashedId" element={<ProtectedRoute> <DetailProjectCreate /> </ProtectedRoute>} />
+
                     <Route path="people" element={<Member />} />
                     <Route path="people/:userHashedId" element={<DetailMember />} />
                     <Route path="register" element={<Register />} />

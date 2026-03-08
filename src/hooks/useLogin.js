@@ -35,11 +35,15 @@ export default function useLogin() {
       const role = res?.role;
       const position = res?.position;
       const loginUsername = res?.data?.username ?? res?.username ?? username.trim();
+      const loginHashedId = res?.data?.hashed_id ?? res?.hashed_id ?? null;
       if (token) {
         try {
           localStorage.setItem(AUTH_TOKEN_KEY, token);
           if (loginUsername) {
             localStorage.setItem('username', loginUsername);
+          }
+          if (loginHashedId) {
+            localStorage.setItem('hashed_id', loginHashedId);
           }
           if (role) {
             localStorage.setItem('role', role);

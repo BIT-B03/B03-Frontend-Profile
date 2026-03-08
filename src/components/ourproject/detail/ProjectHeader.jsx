@@ -4,7 +4,7 @@ import { getAvatarImageUrl } from '../../../api/api';
 import { getProjectStatusMeta } from '../../../utils/projectStatus';
 import ArrowIcon from '../../../assets/arrow.svg';
 
-const ProjectHeader = ({ title, status, creator }) => {
+const ProjectHeader = ({ title, status, creator, backPath = '/project' }) => {
     const navigate = useNavigate();
     const statusMeta = getProjectStatusMeta(status);
 
@@ -23,7 +23,7 @@ const ProjectHeader = ({ title, status, creator }) => {
         <div className="bg-brand-fill border border-brand-stroke rounded-3xl px-4 sm:px-6 py-2 sm:py-4 flex items-center gap-1 sm:gap-4 mt-5">
             {/* Back Button with Arrow SVG - Pointing Left */}
             <button
-                onClick={() => navigate('/project')}
+                onClick={() => navigate(backPath)}
                 className="flex-shrink-0 p-1 sm:p-2 hover:bg-gray-700 rounded-lg transition-colors"
                 title="Back to projects"
             >

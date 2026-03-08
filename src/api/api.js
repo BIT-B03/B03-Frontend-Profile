@@ -41,6 +41,7 @@ API.interceptors.response.use(
         if (status === 401) {
             localStorage.removeItem("auth_access_token");
             localStorage.removeItem("username");
+            localStorage.removeItem("hashed_id");
             localStorage.removeItem("position");
             localStorage.removeItem("role");
 
@@ -192,7 +193,103 @@ export const getProjectThumbnailImageUrl = (filename) => {
     return `/api/projectPublic/thumbnails/${safe}`;
 };
 
+// GET /api/projectPublic/projects?created_by=:hashedId  →  projects milik creator tertentu
+export const getProjectsByCreator = async (creatorHashId) => {
+    const response = await API.get('/projectPublic/projects', {
+        params: { created_by: creatorHashId },
+    });
+    return response.data;
+};
+
+export const getPublicProjects = async () => {
+    const response = await API.get('/projectPublic/projects');
+    return response.data;
+};
+
+export const getInvitedProjects = async () => {
+    const response = await API.get('/project/projects/invited');
+    return response.data;
+};
+
+export const getProjectDetail = async (idHash) => {
+    const response = await API.get(`/project/projects/${idHash}`);
+    return response.data;
+};
+
+export const createProject = async (formData) => {
+    const response = await API.post('/project/projects', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+};
+
+export const editProject = async (idHash, formData) => {
+    const response = await API.put(`/project/projects/${idHash}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+};
+
+export const deleteProject = async (idHash) => {
+    const response = await API.delete(`/project/projects/${idHash}`);
+    return response.data;
+};
+
+export const getProjectAuthThumbnailUrl = (filename) => {
+    if (!filename) return null;
+    const safe = filename.startsWith('/') ? filename.slice(1) : filename;
+    return `/api/project/thumbnails/${safe}`;
+};
+
+// ADMIN SETTINGS
+export const getApplicantRetention = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.get(
+        '/admin/settings/pelamar-retention',
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const updateApplicantRetention = async (days) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.put(
+        '/admin/settings/pelamar-retention',
+        { days },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const getDefaultGeneration = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.get(
+        '/admin/settings/default-generation',
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const updateDefaultGeneration = async (generation) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.put(
+        '/admin/settings/default-generation',
+        { generation },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
 // ADMIN MEMBER
+export const getKickRequests = async () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.get(
+        '/admin/kick-requests',
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
 export const createKickRequest = async (userHashedId, reason) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
     const response = await API.post(
@@ -224,6 +321,16 @@ export const updateAdminMember = async (userHashedId, payload) => {
     const response = await API.put(
         `/admin/updateMember/${userHashedId}`,
         payload,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const approveKickRequest = async (kickHashId) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.put(
+        `/admin/kick-requests/approve/${kickHashId}`,
+        {},
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
     );
     return response.data;
