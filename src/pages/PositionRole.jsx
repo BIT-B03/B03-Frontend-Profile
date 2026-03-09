@@ -143,6 +143,18 @@ export default function PositionRole() {
         }
     };
 
+    const handleMemberPatched = useCallback((memberHashedId, patch) => {
+        if (!memberHashedId || !patch) return;
+
+        setAllUsers((prev) =>
+            prev.map((m) => (m.hashed_id === memberHashedId ? { ...m, ...patch } : m))
+        );
+        setFilteredMembers((prev) =>
+            prev.map((m) => (m.hashed_id === memberHashedId ? { ...m, ...patch } : m))
+        );
+        setActiveMember((prev) => (prev?.hashed_id === memberHashedId ? { ...prev, ...patch } : prev));
+    }, []);
+
     return (
         <GuestMemberBackground>
             <div className="flex min-h-screen bg-brand-vignette overflow-x-hidden">
@@ -209,6 +221,7 @@ export default function PositionRole() {
                         onClose={handleCloseModal}
                         onSave={handleSave}
                         isSaving={isSaving}
+                        onMemberPatched={handleMemberPatched}
                     />
                 </main>
             </div>

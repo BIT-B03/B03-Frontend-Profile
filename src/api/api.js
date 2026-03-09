@@ -156,7 +156,7 @@ export const GetMyProfile = async () => {
 export const UpdateMyProfile = async (formData) => {
     try {
         const response = await API.put('/user/me', formData);
-    
+
         return response.data;
     } catch (error) {
         throw error;
@@ -334,6 +334,56 @@ export const approveKickRequest = async (kickHashId) => {
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
     );
     return response.data;
+};
+
+
+export const uploadMemberDisplay = async (userHashedId, file) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const formData = new FormData();
+    formData.append('display', file);
+    const response = await API.post(
+        `/admin/members/display/${userHashedId}`,
+        formData,
+        {
+            headers: Object.assign(
+                { 'Content-Type': 'multipart/form-data' },
+                token ? { Authorization: `Bearer ${token}` } : {}
+            ),
+        }
+    );
+    return response.data;
+};
+
+export const editMemberDisplay = async (userHashedId, file) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const formData = new FormData();
+    formData.append('display', file);
+    const response = await API.put(
+        `/admin/members/display/${userHashedId}`,
+        formData,
+        {
+            headers: Object.assign(
+                { 'Content-Type': 'multipart/form-data' },
+                token ? { Authorization: `Bearer ${token}` } : {}
+            ),
+        }
+    );
+    return response.data;
+};
+
+export const deleteMemberDisplay = async (userHashedId) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.delete(
+        `/admin/members/display/${userHashedId}`,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const getMemberDisplayPublicUrl = (filename) => {
+    if (!filename) return null;
+    const safe = filename.startsWith('/') ? filename.slice(1) : filename;
+    return `/api/userPublic/display/${safe}`;
 };
 
 export default API;

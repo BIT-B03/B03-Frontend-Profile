@@ -19,10 +19,17 @@ export const SkeletonGrid = () => {
 };
 
 const ImageWithSkeleton = ({ src, alt, placeholderLetter, className = '', onLoad }) => {
+    const [hasError, setHasError] = useState(false);
+
     return (
         <div className={`relative w-full aspect-[4/6] ${className}`}>
-            {src ? (
-                <ImageContent src={src} alt={alt} onLoad={onLoad} />
+            {src && !hasError ? (
+                <ImageContent
+                    src={src}
+                    alt={alt}
+                    onLoad={onLoad}
+                    onError={() => setHasError(true)}
+                />
             ) : (
                 <Placeholder letter={placeholderLetter} onLoad={onLoad} />
             )}
@@ -30,7 +37,7 @@ const ImageWithSkeleton = ({ src, alt, placeholderLetter, className = '', onLoad
     );
 };
 
-const ImageContent = ({ src, alt, onLoad }) => {
+const ImageContent = ({ src, alt, onLoad, onError }) => {
     const [loaded, setLoaded] = useState(false);
 
     const handleLoad = () => {
@@ -46,7 +53,7 @@ const ImageContent = ({ src, alt, onLoad }) => {
                 className="w-full h-full object-cover transition-opacity duration-300"
                 style={{ opacity: loaded ? 1 : 0 }}
                 onLoad={handleLoad}
-                onError={handleLoad}
+                onError={onError}
             />
             {!loaded && (
                 <div className="absolute inset-0 skeleton-base skeleton-shimmer rounded-2xl" />

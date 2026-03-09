@@ -1,13 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import BlurFrame, { CloseButton } from '../common/BlurFrame';
 import PositionRoleProfileCard from './PositionRoleProfileCard';
 import PositionRoleFields from './PositionRoleFields';
-import { getAdminMemberDetail } from '../../api/api';
+import {
+    deleteMemberDisplay,
+    editMemberDisplay,
+    getAdminMemberDetail,
+    getMemberDisplayPublicUrl,
+    uploadMemberDisplay,
+} from '../../api/api';
 
-export default function PositionRoleModal({ isOpen, member, formState, onChange, onClose, onSave, isSaving }) {
+export default function PositionRoleModal({ isOpen, member, formState, onChange, onClose, onSave, isSaving, onMemberPatched }) {
     const [profile, setProfile] = useState(null);
     const [profileLoading, setProfileLoading] = useState(false);
     const [profileError, setProfileError] = useState(null);
+
+    const [photoPreviewUrl, setPhotoPreviewUrl] = useState(null);
+    const [photoUploading, setPhotoUploading] = useState(false);
+    const [photoError, setPhotoError] = useState(null);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        setPhotoError(null);
+        setPhotoUploading(false);
+        setPhotoPreviewUrl(null);
+    }, [isOpen, member?.hashed_id]);
+
+    useEffect(() => {
+        return () => {
+            if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+        };
+    }, [photoPreviewUrl]);
 
     useEffect(() => {
         if (!isOpen || !member?.hashed_id) return undefined;
@@ -36,28 +59,103 @@ export default function PositionRoleModal({ isOpen, member, formState, onChange,
         };
     }, [isOpen, member?.hashed_id]);
 
+    const photoSrc = useMemo(() => {
+        if (photoPreviewUrl) return photoPreviewUrl;
+        const src = profile?.display_url || profile?.avatar_url || member?.display_url || member?.avatar_url || null;
+        return src ? getMemberDisplayPublicUrl(src) : null;
+    }, [photoPreviewUrl, profile?.display_url, profile?.avatar_url, member?.display_url, member?.avatar_url]);
+
+    const photoAlt = profile?.name || member?.name || 'Selected member';
+    const photoPlaceholderLetter = (photoAlt || '').trim().charAt(0).toUpperCase() || '?';
+
+    const handlePickPhoto = async (file, validationError) => {
+        if (validationError) {
+            setPhotoError(validationError);
+            return;
+        }
+        if (!file || !member?.hashed_id) return;
+
+        if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+        const objectUrl = URL.createObjectURL(file);
+        setPhotoPreviewUrl(objectUrl);
+
+        try {
+            setPhotoUploading(true);
+            setPhotoError(null);
+            const hasDisplay = Boolean(profile?.display_url || member?.display_url);
+            if (hasDisplay) {
+                await editMemberDisplay(member.hashed_id, file);
+            } else {
+                await uploadMemberDisplay(member.hashed_id, file);
+            }
+            const fresh = await getAdminMemberDetail(member.hashed_id);
+            const data = fresh?.data ?? fresh ?? null;
+            setProfile(data);
+
+            if (onMemberPatched) {
+                onMemberPatched(member.hashed_id, { display_url: data?.display_url ?? null });
+            }
+
+            setPhotoPreviewUrl(null);
+        } catch (err) {
+            console.error('Failed to upload member photo', err);
+            setPhotoError('Gagal mengunggah foto. Coba lagi.');
+        } finally {
+            setPhotoUploading(false);
+        }
+    };
+
+    const handleDeletePhoto = async () => {
+        if (!member?.hashed_id) return;
+        try {
+            setPhotoUploading(true);
+            setPhotoError(null);
+            await deleteMemberDisplay(member.hashed_id);
+            const fresh = await getAdminMemberDetail(member.hashed_id);
+            const data = fresh?.data ?? fresh ?? null;
+            setProfile(data);
+
+            if (onMemberPatched) {
+                onMemberPatched(member.hashed_id, { display_url: data?.display_url ?? null });
+            }
+        } catch (err) {
+            console.error('Failed to delete member display', err);
+            setPhotoError('Gagal menghapus display. Coba lagi.');
+        } finally {
+            setPhotoUploading(false);
+        }
+    };
+
     return (
         <BlurFrame isOpen={isOpen} onClose={onClose}>
-            <div className="relative flex items-center justify-between px-6 py-5 border-b border-brand-stroke/40 bg-gradient-to-r from-brand-fill/60 via-brand-fill/40 to-brand-fill/60 backdrop-blur-xl">
-                <div className="flex items-center gap-3">
-                    <div>
-                        <h2 className="text-xl sm:text-2xl font-bold text-pure-white tracking-tight">Edit Member</h2>
+            <div className="relative px-6 py-5 border-b border-brand-stroke/40 bg-gradient-to-r from-brand-fill/60 via-brand-fill/40 to-brand-fill/60 backdrop-blur-xl">
+                <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                        <PositionRoleProfileCard
+                            member={member}
+                            profile={profile}
+                            profileLoading={profileLoading}
+                            profileError={profileError}
+                        />
+                    </div>
+                    <div className="ml-4">
+                        <CloseButton onClick={onClose} disabled={isSaving} />
                     </div>
                 </div>
-                <CloseButton onClick={onClose} disabled={isSaving} />
             </div>
 
             <div className="px-6 py-6 space-y-6 bg-gradient-to-b from-transparent to-brand-fill/20">
-                <PositionRoleProfileCard
-                    member={member}
-                    profile={profile}
-                    profileLoading={profileLoading}
-                    profileError={profileError}
-                />
-
                 <PositionRoleFields
                     formState={formState}
                     onChange={onChange}
+                    photoSrc={photoSrc}
+                    photoAlt={photoAlt}
+                    photoPlaceholderLetter={photoPlaceholderLetter}
+                    photoDisabled={isSaving}
+                    photoIsUploading={photoUploading}
+                    photoError={photoError}
+                    onPickPhoto={handlePickPhoto}
+                    onDeletePhoto={handleDeletePhoto}
                     disabled={isSaving}
                 />
             </div>
