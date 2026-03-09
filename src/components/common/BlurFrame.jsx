@@ -18,7 +18,7 @@ export function CloseButton({ onClick, disabled, className = '', ariaLabel = 'Cl
     );
 }
 
-export default function BlurFrame({ isOpen, children, onClose }) {
+export default function BlurFrame({ isOpen, children, onClose, panelClassName = '' }) {
     return (
         <AnimatePresence>
             {isOpen && (
@@ -27,7 +27,7 @@ export default function BlurFrame({ isOpen, children, onClose }) {
                     onClick={onClose}
                 >
                     <motion.div
-                        className="w-full max-w-lg rounded-3xl bg-dark-bg border border-brand-stroke shadow-2xl overflow-hidden"
+                        className={`w-full max-w-lg rounded-3xl bg-dark-bg border border-brand-stroke shadow-2xl overflow-hidden ${panelClassName}`}
                         initial={{ opacity: 0, scale: 0.96, y: 12 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.96, y: 8 }}

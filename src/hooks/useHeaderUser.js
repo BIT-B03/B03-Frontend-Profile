@@ -39,6 +39,7 @@ export const getPositionStyle = (position) => {
 const readHeaderUser = () => ({
   username: localStorage.getItem('username') || 'User',
   position: localStorage.getItem('position') || null,
+  avatarUrl: localStorage.getItem('avatar_url') || null,
 });
 
 export default function useHeaderUser() {
@@ -46,7 +47,7 @@ export default function useHeaderUser() {
 
   useEffect(() => {
     const handleStorage = (event) => {
-      if (!event || (event.key !== 'username' && event.key !== 'position')) return;
+      if (!event || (event.key !== 'username' && event.key !== 'position' && event.key !== 'avatar_url')) return;
       setUser(readHeaderUser());
     };
 

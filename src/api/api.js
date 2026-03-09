@@ -3,10 +3,14 @@ import { MapAuthError } from "./AuthErrorHandler";
 
 const API = axios.create({
     baseURL: "/api",
-    headers: {
-        "Content-Type": "application/json",
-    },
 });
+
+if (typeof window !== "undefined") {
+    const existingToken = localStorage.getItem("auth_access_token");
+    if (existingToken) {
+        API.defaults.headers.common["Authorization"] = `Bearer ${existingToken}`;
+    }
+}
 export const SetAuthToken = (token) => {
     if (token) {
         API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -16,6 +20,18 @@ export const SetAuthToken = (token) => {
 export const ClearAuthToken = () => {
     delete API.defaults.headers.common["Authorization"];
 };
+
+API.interceptors.request.use((config) => {
+    if (typeof window === "undefined") return config;
+    const token = localStorage.getItem("auth_access_token");
+    if (token) {
+        config.headers = {
+            ...config.headers,
+            Authorization: `Bearer ${token}`,
+        };
+    }
+    return config;
+});
 
 API.interceptors.response.use(
     (response) => response,
@@ -129,7 +145,18 @@ export const getAvatarImageUrl = (filename) => {
 // Fetch current authenticated user's profile
 export const GetMyProfile = async () => {
     try {
-        const response = await API.get('/auth/me');
+        const response = await API.get('/user/me');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Update current authenticated user's profile (multipart/form-data)
+export const UpdateMyProfile = async (formData) => {
+    try {
+        const response = await API.put('/user/me', formData);
+    
         return response.data;
     } catch (error) {
         throw error;
