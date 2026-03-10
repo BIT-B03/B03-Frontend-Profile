@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import PositionRolePhotoField from './PositionRolePhotoField';
 
 const generationIcon = '/svg/icon-generation.svg';
 const roleIcon = '/svg/icon-role.svg';
@@ -101,6 +102,14 @@ function NumberField({ id, label, iconSrc, value, onChange, min = 1, max, requir
 export default function PositionRoleFields({
     formState,
     onChange,
+    photoSrc,
+    photoAlt,
+    photoPlaceholderLetter,
+    photoDisabled,
+    photoIsUploading,
+    photoError,
+    onPickPhoto,
+    onDeletePhoto,
     roleOptions = [],
     positionOptions = [],
     disabled,
@@ -127,6 +136,18 @@ export default function PositionRoleFields({
     const positionOpts = positionOptions && positionOptions.length ? positionOptions : defaultPositionOptions;
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {onPickPhoto && (
+                <PositionRolePhotoField
+                    src={photoSrc}
+                    alt={photoAlt}
+                    placeholderLetter={photoPlaceholderLetter}
+                    disabled={photoDisabled ?? disabled}
+                    isUploading={photoIsUploading}
+                    error={photoError}
+                    onPickFile={onPickPhoto}
+                    onDeleteFile={onDeletePhoto}
+                />
+            )}
             <NumberField
                 id="position-role-generation"
                 label="Generation"

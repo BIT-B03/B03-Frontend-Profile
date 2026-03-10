@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ImageWithSkeleton from './ImageWithSkeleton';
-import { getAvatarImageUrl } from '../../../api/api';
+import { getMemberDisplayPublicUrl } from '../../../api/api';
 
 const MemberCard = ({ member }) => {
     const navigate = useNavigate();
-    const avatarUrl = member.avatar_url ? getAvatarImageUrl(member.avatar_url) : null;
+    const avatarUrl = member.display_url || member.avatar_url ? getMemberDisplayPublicUrl(member.display_url || member.avatar_url) : null;
     const [isLoaded, setIsLoaded] = useState(!avatarUrl);
+    const placeholderLetter = (member.name || '').trim().charAt(0).toUpperCase() || '?';
 
     const isMentor = member.position === 'Mentor';
     const displayPosition = isMentor
@@ -41,7 +42,7 @@ const MemberCard = ({ member }) => {
                 <ImageWithSkeleton
                     src={avatarUrl}
                     alt={member.name}
-                    placeholderLetter={member.name.charAt(0).toUpperCase()}
+                    placeholderLetter={placeholderLetter}
                     onLoad={() => setIsLoaded(true)}
                 />
 
