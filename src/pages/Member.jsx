@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 import '../styles/index.css';
-import { getAllUsers } from '../api/api';
 import Navbar from '../components/Navbar';
-import { sortMembers } from '../utils/members';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import usePagedMembersData from '../hooks/usePagedMembersData';
+import { getAllUsers } from '../api/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import MemberCard from '../components/member/common/MemberCard';
 import TitleSection from '../components/member/common/TitleSection';
@@ -14,6 +13,8 @@ import ErrorBanner from '../components/ErrorHendler/member/ErrorBanner';
 import SkeletonGrid from '../components/member/common/ImageWithSkeleton';
 import BackgroundLayout from '../components/layout/GuestMemberBackground';
 import { GRID_CLASSES } from '../components/member/common/ImageWithSkeleton';
+import Pagination from '../components/filter/Pagination';
+import useQueryPagination from '../hooks/useQueryPagination';
 
 const navItems = [
     { label: 'Home', href: '/' },
@@ -22,67 +23,65 @@ const navItems = [
 ];
 
 const MemberPageContent = () => {
-    const [allUsers, setAllUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [activeFilter, setActiveFilter] = useState('all');
     const [selectedGeneration, setSelectedGeneration] = useState(null);
+    const [selectedPosition, setSelectedPosition] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const [animationKey, setAnimationKey] = useState(0);
-    const [generations, setGenerations] = useState([]);
+    const { currentPage, setPage, resetPage } = useQueryPagination();
+    const itemsPerPage = 12;
 
-    const hydrateStateFromUsers = (users) => {
-        setAllUsers(users);
-        setFilteredUsers(sortMembers(users));
+    const {
+        users,
+        totalCount,
+        loading,
+        isTransitioning,
+        error,
+        generations,
+        refetch,
+    } = usePagedMembersData({
+        fetchPage: (params) => getAllUsers(params),
+        fetchAll: () => getAllUsers(),
+        currentPage,
+        activeFilter,
+        selectedGeneration,
+        selectedPosition,
+        searchTerm,
+        itemsPerPage,
+    });
 
-        const uniqueGens = [...new Set(
-            users
-                .filter(user => user.position !== 'Mentor')
-                .map(user => user.generation)
-        )].sort((a, b) => b - a);
+    // Data fetching, caching and prefetching are handled in `usePagedMembersData` hook.
 
-        setGenerations(uniqueGens);
-    };
-
-    const fetchUsers = async () => {
-        try {
-            setLoading(true);
-
-            const response = await getAllUsers();
-            const users = response.data;
-            hydrateStateFromUsers(users);
-            setError(null);
-        } catch (err) {
-            setError('Failed to load users data');
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-
-    const handleApplyFilters = ({ filtered, activeFilter: nextActive, selectedGeneration: nextGen, skipAnimation = false }) => {
+    const handleApplyFilters = ({
+        activeFilter: nextActive,
+        selectedGeneration: nextGen,
+        positionValue,
+        searchTerm: nextSearch,
+        skipAnimation = false,
+    }) => {
         if (!skipAnimation) {
             setAnimationKey(prev => prev + 1);
         }
         setActiveFilter(nextActive);
         setSelectedGeneration(nextGen ?? null);
-        setFilteredUsers(filtered);
+        setSelectedPosition(positionValue ?? null);
+        setSearchTerm(nextSearch ?? '');
+        resetPage();
     };
 
     const handleClearFilters = () => {
         handleApplyFilters({
-            filtered: sortMembers(allUsers),
             activeFilter: 'all',
             selectedGeneration: null,
+            positionValue: null,
+            searchTerm: '',
             skipAnimation: true,
         });
     };
 
     const isFiltered = activeFilter !== 'all' || selectedGeneration !== null;
+    const visibleUsers = users;
+    const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
 
     return (
         <div className="pt-4 pb-16 max-w-full mx-auto">
@@ -90,7 +89,6 @@ const MemberPageContent = () => {
 
             <div className="mb-8">
                 <Filters
-                    allUsers={allUsers}
                     activeFilter={activeFilter}
                     selectedGeneration={selectedGeneration}
                     generations={generations}
@@ -98,18 +96,18 @@ const MemberPageContent = () => {
                 />
             </div>
 
-            {loading && allUsers.length === 0 && (
+            {loading && users.length === 0 && (
                 <SkeletonGrid />
             )}
 
             {!loading && error && (
-                <ErrorBanner message={error} onRetry={() => fetchUsers()} />
+                <ErrorBanner message={error} onRetry={refetch} />
             )}
 
-            {!error && filteredUsers.length > 0 && (
-                <div key={animationKey} className={GRID_CLASSES}>
+            {!error && visibleUsers.length > 0 && (
+                <div key={animationKey} className={`${GRID_CLASSES} ${isTransitioning ? 'opacity-75 pointer-events-none transition-opacity duration-300' : ''}`}>
                     <AnimatePresence mode="popLayout">
-                        {filteredUsers.map((member) => (
+                        {visibleUsers.map((member) => (
                             <motion.div
                                 key={member.hashed_id}
                                 layout
@@ -125,7 +123,17 @@ const MemberPageContent = () => {
                 </div>
             )}
 
-            {!error && filteredUsers.length === 0 && (
+            {!error && totalPages > 1 && (
+                <div className="max-w-5xl mx-auto px-6 mt-6">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setPage}
+                    />
+                </div>
+            )}
+
+            {!error && visibleUsers.length === 0 && (
                 <EmptyState onClearFilters={handleClearFilters} showReset={isFiltered} />
             )}
         </div>

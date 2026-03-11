@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
 import GuestMemberBackground from '../components/layout/GuestMemberBackground';
@@ -7,62 +7,45 @@ import EmptyState from '../components/filter/EmptyState';
 import MemberFilters from '../components/member/common/MemberFilters';
 import PositionRoleMemberCard from '../components/position-role/PositionRoleMemberCard';
 import PositionRoleModal from '../components/position-role/PositionRoleModal';
+import Pagination from '../components/filter/Pagination';
+import useQueryPagination from '../hooks/useQueryPagination';
+import usePagedMembersData from '../hooks/usePagedMembersData';
 import { getAdminMembers } from '../api/api';
-import { sortMembers } from '../utils/members';
 import { usePositionRoleUpdate } from '../hooks/usePositionRoleUpdate';
 
 export default function PositionRole() {
     const [collapsed, setCollapsed] = useSidebarCollapsed();
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-    const [allUsers, setAllUsers] = useState([]);
-    const [filteredMembers, setFilteredMembers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [activeMember, setActiveMember] = useState(null);
     const [formState, setFormState] = useState({ position: '', role: '', generation: '' });
     const [activeFilter, setActiveFilter] = useState('all');
     const [selectedGeneration, setSelectedGeneration] = useState(null);
+    const [selectedPosition, setSelectedPosition] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [animationKey, setAnimationKey] = useState(0);
+    const { currentPage, setPage, resetPage } = useQueryPagination();
+    const itemsPerPage = 12;
+
+    const {
+        users,
+        totalCount,
+        loading,
+        isTransitioning,
+        error,
+        generations,
+    } = usePagedMembersData({
+        fetchPage: (params) => getAdminMembers(params),
+        fetchAll: () => getAdminMembers(),
+        currentPage,
+        activeFilter,
+        selectedGeneration,
+        selectedPosition,
+        searchTerm,
+        itemsPerPage,
+    });
     const { isSaving, saveMemberChanges } = usePositionRoleUpdate({
-        onSuccess: ({ member, payload }) => {
+        onSuccess: ({ member }) => {
             if (!member?.hashed_id) return;
-
-            setAllUsers((prev) =>
-                prev.map((m) => {
-                    if (m.hashed_id !== member.hashed_id) return m;
-                    const next = { ...m };
-
-                    if (payload?.position !== undefined) {
-                        next.position = payload.position;
-                    }
-                    if (payload?.new_role !== undefined) {
-                        next.role = payload.new_role;
-                    }
-                    if (payload?.generation !== undefined) {
-                        next.generation = payload.generation;
-                    }
-
-                    return next;
-                })
-            );
-
-            setFilteredMembers((prev) =>
-                prev.map((m) => {
-                    if (m.hashed_id !== member.hashed_id) return m;
-                    const next = { ...m };
-
-                    if (payload?.position !== undefined) {
-                        next.position = payload.position;
-                    }
-                    if (payload?.new_role !== undefined) {
-                        next.role = payload.new_role;
-                    }
-                    if (payload?.generation !== undefined) {
-                        next.generation = payload.generation;
-                    }
-
-                    return next;
-                })
-            );
 
             setActiveMember(null);
         },
@@ -75,46 +58,20 @@ export default function PositionRole() {
         };
     }, [mobileSidebarOpen]);
 
-    useEffect(() => {
-        let cancelled = false;
-
-        const fetchUsers = async () => {
-            try {
-                setLoading(true);
-                const members = await getAdminMembers();
-                if (cancelled) return;
-
-                const users = Array.isArray(members) ? members : [];
-                setAllUsers(users);
-                setFilteredMembers(sortMembers(users));
-                setError(null);
-            } catch {
-                if (cancelled) return;
-                setError('Failed to load members');
-            } finally {
-                if (!cancelled) setLoading(false);
-            }
-        };
-
-        fetchUsers();
-        return () => {
-            cancelled = true;
-        };
-    }, []);
-
-    const generations = useMemo(() => {
-        const genSet = new Set();
-        allUsers.forEach((user) => {
-            if (user.generation && user.position !== 'Mentor') genSet.add(user.generation);
-        });
-        return Array.from(genSet).sort((a, b) => b - a);
-    }, [allUsers]);
-
-    const handleApplyFilters = useCallback(({ filtered, activeFilter: nextActive, selectedGeneration: nextGen }) => {
-        setFilteredMembers(filtered);
-        if (nextActive !== undefined) setActiveFilter(nextActive);
-        if (nextGen !== undefined) setSelectedGeneration(nextGen);
-    }, []);
+    const handleApplyFilters = useCallback(({
+        activeFilter: nextActive,
+        selectedGeneration: nextGen,
+        positionValue,
+        searchTerm: nextSearch,
+        skipAnimation = false,
+    }) => {
+        if (!skipAnimation) setAnimationKey((prev) => prev + 1);
+        setActiveFilter(nextActive);
+        setSelectedGeneration(nextGen ?? null);
+        setSelectedPosition(positionValue ?? null);
+        setSearchTerm(nextSearch ?? '');
+        resetPage();
+    }, [resetPage]);
 
     const handleOpenEdit = (member) => {
         setActiveMember(member);
@@ -146,14 +103,11 @@ export default function PositionRole() {
     const handleMemberPatched = useCallback((memberHashedId, patch) => {
         if (!memberHashedId || !patch) return;
 
-        setAllUsers((prev) =>
-            prev.map((m) => (m.hashed_id === memberHashedId ? { ...m, ...patch } : m))
-        );
-        setFilteredMembers((prev) =>
-            prev.map((m) => (m.hashed_id === memberHashedId ? { ...m, ...patch } : m))
-        );
         setActiveMember((prev) => (prev?.hashed_id === memberHashedId ? { ...prev, ...patch } : prev));
     }, []);
+
+    const visibleUsers = users;
+    const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
 
     return (
         <GuestMemberBackground>
@@ -176,7 +130,6 @@ export default function PositionRole() {
 
                         <section className="mt-6">
                             <MemberFilters
-                                allUsers={allUsers}
                                 activeFilter={activeFilter}
                                 selectedGeneration={selectedGeneration}
                                 generations={generations}
@@ -197,17 +150,29 @@ export default function PositionRole() {
                                 </div>
                             )}
 
-                            {!loading && !error && filteredMembers.length === 0 && <EmptyState />}
+                            {!error && visibleUsers.length === 0 && <EmptyState />}
 
-                            {!loading && !error && filteredMembers.length > 0 && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {filteredMembers.map((member) => (
-                                        <PositionRoleMemberCard
-                                            key={member.hashed_id}
-                                            member={member}
-                                            onEdit={() => handleOpenEdit(member)}
-                                        />
-                                    ))}
+                            {!error && visibleUsers.length > 0 && (
+                                <div key={animationKey} className={`${isTransitioning ? 'opacity-75 pointer-events-none transition-opacity duration-300' : ''}`}>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {visibleUsers.map((member) => (
+                                            <PositionRoleMemberCard
+                                                key={member.hashed_id}
+                                                member={member}
+                                                onEdit={() => handleOpenEdit(member)}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {!error && totalPages > 1 && (
+                                <div className="max-w-5xl mx-auto px-6 mt-6">
+                                    <Pagination
+                                        currentPage={currentPage}
+                                        totalPages={totalPages}
+                                        onPageChange={setPage}
+                                    />
                                 </div>
                             )}
                         </section>

@@ -6,7 +6,6 @@ import PositionDropdown from './PositionDropdown';
 import useMemberFilters from '../../../hooks/useMemberFilters';
 
 const Filters = ({
-    allUsers = [],
     activeFilter,
     selectedGeneration,
     generations,
@@ -18,7 +17,7 @@ const Filters = ({
         applyPosition,
         applyGeneration,
         handleSearchChange,
-    } = useMemberFilters({ allUsers, activeFilter, selectedGeneration, onApply });
+    } = useMemberFilters({ activeFilter, selectedGeneration, onApply });
 
     const getVariantClass = (variant) => (variant === 'mentor' ? '' : '');
 
