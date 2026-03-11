@@ -78,11 +78,13 @@ export default function CreateProject() {
     } catch (err) {
       const status = err?.response?.status;
       if (status === 401) { navigate('/login', { replace: true }); return; }
-      // 404 = no projects found — treat as empty list, not an error
-      if (status === 404) {
+      // Any HTTP error response (4xx/5xx) → treat as empty list so admin/superadmin
+      // are not shown a false error when the backend returns non-404 for "no data"
+      if (status) {
         setProjects([]);
         return;
       }
+      // Only show error for real network failures (no response at all)
       setError('Gagal memuat data proyek');
     } finally {
       setLoading(false);

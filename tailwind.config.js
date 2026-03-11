@@ -25,8 +25,8 @@ export default {
         // Filter Button Colors
         'filter-all-bg': 'rgba(183,183,183,0.45)',
         'filter-all-border': '#979797',
-        'filter-red-bg': 'rgba(222,0,0,0.35)',
-        'filter-red-border': '#980000',
+        'filter-red-bg': 'rgba(240,80,80,0.35)',
+        'filter-red-border': '#F05050',
         'filter-sage-bg': 'rgba(34,165,167,0.45)',
         'filter-sage-border': '#22A5A7',
 

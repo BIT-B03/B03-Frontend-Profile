@@ -386,4 +386,58 @@ export const getMemberDisplayPublicUrl = (filename) => {
     return `/api/userPublic/display/${safe}`;
 };
 
+// ADMIN PELAMAR
+const getAdminToken = () =>
+    typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+
+export const getAdminPelamar = async () => {
+    const token = getAdminToken();
+    const response = await API.get(
+        '/admin/pelamar',
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const getAdminPelamarDetail = async (idHash) => {
+    const token = getAdminToken();
+    const response = await API.get(
+        `/admin/pelamar/${idHash}`,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const getAdminPelamarCV = async (idHash) => {
+    const token = getAdminToken();
+    const response = await API.get(
+        `/admin/pelamar/${idHash}/cv`,
+        {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+            responseType: 'blob',
+        }
+    );
+    return response.data; // Blob
+};
+
+export const confirmPelamar = async (idHash) => {
+    const token = getAdminToken();
+    const response = await API.put(
+        `/admin/pelamar/confirm/${idHash}`,
+        {},
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
+export const rejectPelamar = async (idHash) => {
+    const token = getAdminToken();
+    const response = await API.put(
+        `/admin/pelamar/reject/${idHash}`,
+        {},
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
 export default API;

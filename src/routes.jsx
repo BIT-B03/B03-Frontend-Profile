@@ -19,6 +19,7 @@ import NotFoundRedirect from './pages/NotFoundRedirect.jsx';
 import ProtectedRoute from './utils/ProtectRoute';
 import KickRequests from './pages/KickRequests.jsx';
 import CreateKickRequest from './pages/CreateKickRequest.jsx';
+import ConfirmPelamar from './pages/ConfirmPelamar.jsx';
 import PositionRole from './pages/PositionRole.jsx';
 import Profile from './pages/Profile.jsx';
 import CreateProject from './pages/CreateProject.jsx';
@@ -35,6 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path="dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
                     <Route path="member-management/kick-request" element={<ProtectedRoute> <KickRequests /> </ProtectedRoute>} />
                     <Route path="member-management/kick-request/create" element={<ProtectedRoute> <CreateKickRequest /> </ProtectedRoute>} />
+                    <Route path="member-management/confirm-pelamar" element={<ProtectedRoute> <ConfirmPelamar /> </ProtectedRoute>} />
                     <Route path="member-management/position-role" element={<ProtectedRoute> <PositionRole /> </ProtectedRoute>} />
                     <Route path="profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
                     <Route path="settings" element={<ProtectedRoute> <Settings /> </ProtectedRoute>} />
