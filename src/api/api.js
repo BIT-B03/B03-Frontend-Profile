@@ -114,9 +114,9 @@ export const ResetPassword = async ({ token, new_password }) => {
 };
 
 // Fetch all users public data
-export const getAllUsers = async () => {
+export const getAllUsers = async (params = undefined) => {
     try {
-        const response = await API.get('/userPublic/users');
+        const response = await API.get('/userPublic/users', params ? { params } : undefined);
         return response.data;
     } catch (error) {
         console.error("Error fetching users data:", error);
@@ -298,11 +298,13 @@ export const createKickRequest = async (userHashedId, reason) => {
     ); return response.data;
 };
 
-export const getAdminMembers = async () => {
+export const getAdminMembers = async (params = undefined) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
     const response = await API.get(
         '/admin/members',
-        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+        params
+            ? { params, headers: token ? { Authorization: `Bearer ${token}` } : {} }
+            : { headers: token ? { Authorization: `Bearer ${token}` } : {} }
     );
     return response.data;
 };

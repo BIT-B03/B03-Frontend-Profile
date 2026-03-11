@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import useSidebarCollapsed from '../hooks/useSidebarCollapsed';
 import Sidebar from '../components/common/Sidebar';
 import Header from '../components/common/Header';
 import GuestMemberBackground from '../components/layout/GuestMemberBackground';
 import EmptyState from '../components/filter/EmptyState';
+import Pagination from '../components/filter/Pagination';
+import useQueryPagination from '../hooks/useQueryPagination';
+import usePagedMembersData from '../hooks/usePagedMembersData';
 import { getAdminMembers } from '../api/api';
-import { sortMembers } from '../utils/members';
 import useSelection from '../hooks/useSelectionKick';
 import MemberFilters from '../components/member/common/MemberFilters';
 import KickMemberCard from '../components/kick-request/KickMemberCard';
@@ -17,12 +19,13 @@ import useKickRequestsData from '../hooks/useKickRequestsData';
 export default function CreateKickRequest() {
     const [collapsed, setCollapsed] = useSidebarCollapsed();
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-    const [allUsers, setAllUsers] = useState([]);
-    const [filteredMembers, setFilteredMembers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [activeFilter, setActiveFilter] = useState('all');
     const [selectedGeneration, setSelectedGeneration] = useState(null);
+    const [selectedPosition, setSelectedPosition] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [animationKey, setAnimationKey] = useState(0);
+    const { currentPage, setPage, resetPage } = useQueryPagination();
+    const itemsPerPage = 12;
     const { has, toggle, clear, count } = useSelection();
     const { requests: existingKickRequests, refetch: refetchKickRequests } = useKickRequestsData();
 
@@ -44,6 +47,24 @@ export default function CreateKickRequest() {
         },
     });
 
+    const {
+        users,
+        totalCount,
+        loading,
+        isTransitioning,
+        error,
+        generations,
+    } = usePagedMembersData({
+        fetchPage: (params) => getAdminMembers(params),
+        fetchAll: () => getAdminMembers(),
+        currentPage,
+        activeFilter,
+        selectedGeneration,
+        selectedPosition,
+        searchTerm,
+        itemsPerPage,
+    });
+
     useEffect(() => {
         document.body.style.overflow = mobileSidebarOpen ? 'hidden' : '';
         return () => {
@@ -51,52 +72,29 @@ export default function CreateKickRequest() {
         };
     }, [mobileSidebarOpen]);
 
-    useEffect(() => {
-        let cancelled = false;
-
-        const fetchUsers = async () => {
-            try {
-                setLoading(true);
-                const members = await getAdminMembers();
-                if (cancelled) return;
-
-                const users = Array.isArray(members) ? members : [];
-                setAllUsers(users);
-                setFilteredMembers(sortMembers(users));
-                setError(null);
-            } catch {
-                if (cancelled) return;
-                setError('Failed to load members');
-            } finally {
-                if (!cancelled) setLoading(false);
-            }
-        };
-
-        fetchUsers();
-        return () => {
-            cancelled = true;
-        };
-    }, []);
-
-    const generations = useMemo(() => {
-        const genSet = new Set();
-        allUsers.forEach((user) => {
-            if (user.generation && user.position !== 'Mentor') genSet.add(user.generation);
-        });
-        return Array.from(genSet).sort((a, b) => b - a);
-    }, [allUsers]);
-
-    const handleApplyFilters = useCallback(({ filtered, activeFilter: nextActive, selectedGeneration: nextGen }) => {
-        setFilteredMembers(filtered);
-        if (nextActive !== undefined) setActiveFilter(nextActive);
-        if (nextGen !== undefined) setSelectedGeneration(nextGen);
-    }, []);
+    const handleApplyFilters = useCallback(({
+        activeFilter: nextActive,
+        selectedGeneration: nextGen,
+        positionValue,
+        searchTerm: nextSearch,
+        skipAnimation = false,
+    }) => {
+        if (!skipAnimation) setAnimationKey((prev) => prev + 1);
+        setActiveFilter(nextActive);
+        setSelectedGeneration(nextGen ?? null);
+        setSelectedPosition(positionValue ?? null);
+        setSearchTerm(nextSearch ?? '');
+        resetPage();
+    }, [resetPage]);
 
     const handleOpenKickModal = () => {
-        const selectedList = allUsers.filter((member) => has(member.hashed_id));
+        const selectedList = users.filter((member) => has(member.hashed_id));
         if (selectedList.length === 0) return;
         openKickModal(selectedList);
     };
+
+    const visibleUsers = users;
+    const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
 
     return (
         <GuestMemberBackground>
@@ -120,7 +118,6 @@ export default function CreateKickRequest() {
 
                         <section className="mt-6">
                             <MemberFilters
-                                allUsers={allUsers}
                                 activeFilter={activeFilter}
                                 selectedGeneration={selectedGeneration}
                                 generations={generations}
@@ -141,18 +138,30 @@ export default function CreateKickRequest() {
                                 </div>
                             )}
 
-                            {!loading && !error && filteredMembers.length === 0 && <EmptyState />}
+                            {!error && visibleUsers.length === 0 && <EmptyState />}
 
-                            {!loading && !error && filteredMembers.length > 0 && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {filteredMembers.map((member) => (
-                                        <KickMemberCard
-                                            key={member.hashed_id}
-                                            member={member}
-                                            selected={has(member.hashed_id)}
-                                            onToggle={() => toggle(member.hashed_id)}
-                                        />
-                                    ))}
+                            {!error && visibleUsers.length > 0 && (
+                                <div key={animationKey} className={`${isTransitioning ? 'opacity-75 pointer-events-none transition-opacity duration-300' : ''}`}>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {visibleUsers.map((member) => (
+                                            <KickMemberCard
+                                                key={member.hashed_id}
+                                                member={member}
+                                                selected={has(member.hashed_id)}
+                                                onToggle={() => toggle(member.hashed_id)}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {!error && totalPages > 1 && (
+                                <div className="max-w-5xl mx-auto px-6 mt-6">
+                                    <Pagination
+                                        currentPage={currentPage}
+                                        totalPages={totalPages}
+                                        onPageChange={setPage}
+                                    />
                                 </div>
                             )}
                         </section>

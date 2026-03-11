@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
-import { sortMembers } from '../utils/members';
 
-export default function useMemberFilters({ allUsers = [], activeFilter, selectedGeneration, onApply }) {
+export default function useMemberFilters({ activeFilter, selectedGeneration, onApply }) {
     const [searchTerm, setSearchTerm] = useState('');
 
     const processAndApply = useCallback(({
@@ -15,33 +14,19 @@ export default function useMemberFilters({ allUsers = [], activeFilter, selected
 
         const nextFilter = filterType || 'all';
         const normalizedGeneration = nextFilter === 'generation' ? generationValue ?? null : null;
-
-        let baseList;
-        if (nextFilter === 'mentor') {
-            const mentorsOnly = allUsers.filter(user => user.position === 'Mentor');
-            baseList = sortMembers(mentorsOnly);
-        } else if (nextFilter === 'generation') {
-            baseList = sortMembers(allUsers, { generationFilter: normalizedGeneration, excludeMentors: true });
-        } else if (typeof nextFilter === 'string' && nextFilter.startsWith('position:')) {
-            const pos = positionValue ?? nextFilter.split(':')[1];
-            const byPos = allUsers.filter(user => user.position === pos);
-            baseList = sortMembers(byPos);
-        } else {
-            baseList = sortMembers(allUsers);
-        }
-
-        const query = (typeof searchValue === 'string' ? searchValue : searchTerm).trim().toLowerCase();
-        const filteredBySearch = query
-            ? baseList.filter(user => (user.name || '').toLowerCase().includes(query))
-            : baseList;
+        const query = (typeof searchValue === 'string' ? searchValue : searchTerm).trim();
+        const resolvedPosition = typeof nextFilter === 'string' && nextFilter.startsWith('position:')
+            ? (positionValue ?? nextFilter.split(':')[1])
+            : positionValue;
 
         onApply({
-            filtered: filteredBySearch,
             activeFilter: nextFilter,
             selectedGeneration: normalizedGeneration,
+            positionValue: resolvedPosition,
+            searchTerm: query,
             skipAnimation,
         });
-    }, [allUsers, activeFilter, selectedGeneration, onApply, searchTerm]);
+    }, [activeFilter, selectedGeneration, onApply, searchTerm]);
 
     const applyFilter = useCallback((filterType) => {
         processAndApply({
@@ -71,12 +56,13 @@ export default function useMemberFilters({ allUsers = [], activeFilter, selected
         const value = event.target.value;
         setSearchTerm(value);
         processAndApply({
-            filterType: activeFilter || 'all',
-            generationValue: activeFilter === 'generation' ? selectedGeneration : null,
+            filterType: 'all',
+            generationValue: null,
+            positionValue: null,
             searchValue: value,
             skipAnimation: false,
         });
-    }, [processAndApply, activeFilter, selectedGeneration]);
+    }, [processAndApply]);
 
     return {
         searchTerm,
