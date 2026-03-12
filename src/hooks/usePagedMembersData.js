@@ -4,7 +4,6 @@ import { sortMembers } from '../utils/members';
 
 export default function usePagedMembersData({
     fetchPage,
-    fetchAll,
     currentPage,
     activeFilter,
     selectedGeneration,
@@ -28,12 +27,25 @@ export default function usePagedMembersData({
             .map(user => user.generation)
     )].sort((a, b) => b - a));
 
+    const normalizeGenerationList = (list) => {
+        if (!Array.isArray(list) || list.length === 0) return [];
+        const values = list
+            .map((item) => (typeof item === 'number' ? item : item?.value))
+            .filter((value) => typeof value === 'number');
+        return [...new Set(values)].sort((a, b) => b - a);
+    };
+
     const hydrateStateFromUsers = (nextUsers, count, generationList) => {
         const sorted = sortMembers(nextUsers);
         setUsers(sorted);
         setTotalCount(typeof count === 'number' ? count : sorted.length);
 
         if (Array.isArray(generationList) && generationList.length) {
+            const normalized = normalizeGenerationList(generationList);
+            if (normalized.length) {
+                setGenerations(normalized);
+                return;
+            }
             setGenerations(generationList);
             return;
         }
@@ -98,21 +110,6 @@ export default function usePagedMembersData({
         }
     };
 
-    const fetchGenerations = async () => {
-        try {
-            if (generations.length > 0) return;
-            if (!fetchAll) return;
-
-            const response = await fetchAll();
-            const allUsers = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
-            if (allUsers.length) {
-                setGenerations(buildGenerationList(allUsers));
-            }
-        } catch (err) {
-            console.error('Failed to load generation list', err);
-        }
-    };
-
     const cacheKey = JSON.stringify({ activeFilter, selectedGeneration, selectedPosition, searchTerm, itemsPerPage });
 
     const fetchUsers = async () => {
@@ -136,9 +133,12 @@ export default function usePagedMembersData({
                 return;
             }
 
-            if (users.length === 0) {
+            // Only show loading for completely empty state, use transition for filter changes
+            if (users.length === 0 && !cacheRef.current.pages.size) {
                 setLoading(true);
+                setIsTransitioning(false);
             } else {
+                setLoading(false);
                 setIsTransitioning(true);
             }
 
@@ -175,19 +175,12 @@ export default function usePagedMembersData({
     };
 
     useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            void fetchUsers();
-        }, 50);
+        void fetchUsers();
 
         return () => {
-            clearTimeout(timeoutId);
             if (abortControllerRef.current) abortControllerRef.current.abort();
         };
     }, [currentPage, activeFilter, selectedGeneration, selectedPosition, searchTerm]);
-
-    useEffect(() => {
-        if (generations.length === 0) void fetchGenerations();
-    }, []);
 
     const refetch = () => {
         void fetchUsers();
