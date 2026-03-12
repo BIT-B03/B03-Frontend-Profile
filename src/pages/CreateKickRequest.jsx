@@ -56,7 +56,6 @@ export default function CreateKickRequest() {
         generations,
     } = usePagedMembersData({
         fetchPage: (params) => getAdminMembers(params),
-        fetchAll: () => getAdminMembers(),
         currentPage,
         activeFilter,
         selectedGeneration,

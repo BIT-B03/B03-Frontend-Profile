@@ -35,7 +35,6 @@ export default function PositionRole() {
         generations,
     } = usePagedMembersData({
         fetchPage: (params) => getAdminMembers(params),
-        fetchAll: () => getAdminMembers(),
         currentPage,
         activeFilter,
         selectedGeneration,

@@ -41,7 +41,6 @@ const MemberPageContent = () => {
         refetch,
     } = usePagedMembersData({
         fetchPage: (params) => getAllUsers(params),
-        fetchAll: () => getAllUsers(),
         currentPage,
         activeFilter,
         selectedGeneration,
