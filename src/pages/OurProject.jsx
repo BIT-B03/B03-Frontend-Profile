@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/homepage/Footer'
@@ -6,8 +6,10 @@ import GlowSvg from '../assets/glow.svg'
 import StatsSection from '../components/ourproject/StatsSection'
 import FilterSearch from '../components/ourproject/FilterSearch'
 import ProjectsGrid from '../components/ourproject/ProjectsGrid'
-import axios from 'axios'
-import { getProjectStatusMeta } from '../utils/projectStatus'
+import Pagination from '../components/filter/Pagination'
+import useQueryPagination from '../hooks/useQueryPagination'
+import usePagedProjectsData from '../hooks/usePagedProjectsData'
+import { getPublicProjects } from '../api/api'
 
 export default function OurProject() {
   const navigate = useNavigate()
@@ -18,119 +20,44 @@ export default function OurProject() {
     { label: 'People', href: '/people' }
   ]
 
-  const [projects, setProjects] = useState([])
-  const [filteredProjects, setFilteredProjects] = useState([])
-  // default to public project blueprint prefix used by Flask
-  const [apiBase, setApiBase] = useState('/api/projectPublic')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
   const [activeFilter, setActiveFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const { currentPage, setPage, resetPage } = useQueryPagination()
+  const itemsPerPage = 12
+  const fetchProjectsPage = useCallback((params) => getPublicProjects(params), [])
 
-  // Fetch projects dari backend
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true)
+  const {
+    projects,
+    totalCount,
+    loading,
+    isTransitioning,
+    error,
+  } = usePagedProjectsData({
+    fetchPage: fetchProjectsPage,
+    currentPage,
+    activeFilter,
+    searchTerm: searchQuery,
+    itemsPerPage,
+  })
 
-        // try with /api prefix first (common when backend mounted at /api)
-        let response = null
-        let lastError = null
-        try {
-          // try the public blueprint path registered as '/api/projectPublic'
-          response = await axios.get('/api/projectPublic/projects')
-          setApiBase('/api/projectPublic')
-        } catch (err) {
-          lastError = err
-          console.warn('/api/projectPublic/projects failed:', err?.response?.status, err?.message)
-          try {
-            // fallback to direct backend absolute URL if proxy not working
-            response = await axios.get('http://127.0.0.1:5000/api/projectPublic/projects')
-            setApiBase('http://127.0.0.1:5000/api/projectPublic')
-          } catch (err2) {
-            // both attempts failed - log details and throw to outer catch
-            console.error('/projects fallback failed:', err2?.response?.status, err2?.message)
-            // enhance error with both responses for debugging
-            const status1 = lastError?.response?.status
-            const data1 = lastError?.response?.data
-            const status2 = err2?.response?.status
-            const data2 = err2?.response?.data
-            console.error('API attempts results:', { '/api/projects': { status: status1, data: data1 }, '/projects': { status: status2, data: data2 } })
-            throw err2
-          }
-        }
+  const handleSetActiveFilter = (value) => {
+    setActiveFilter(value)
+    resetPage()
+  }
 
-        // backend may return { count, data: [ ... ], message } or an array directly
-        console.log('projects response', response.data)
-        const rawItems = (response.data && response.data.data) ? response.data.data : response.data
-        const items = Array.isArray(rawItems) ? rawItems : []
-
-        if (!Array.isArray(rawItems)) {
-          console.error('Unexpected projects payload, expected array but got:', rawItems)
-        }
-
-        // normalize to shape used by UI
-        const mapped = items.map((p, idx) => {
-          const statusMeta = getProjectStatusMeta(p.status)
-
-          return {
-            id: p.id || idx,
-            id_hash: p.hashed_id || p.id_hash || '',
-            title: p.title || p.name || 'Untitled',
-            description: p.short_description || p.description || '',
-            status: statusMeta.label,
-            statusTone: statusMeta.tone,
-            thumbnail_url: p.thumbnail || p.thumbnail_url || '',
-            // Sertakan creator dari backend jika ada
-            creator: p.creator || null,
-            // Hitung total anggota: creator + contributors (hindari duplikat)
-            contributors: Array.isArray(p.contributors) ? p.contributors : [],
-            team_members: (Array.isArray(p.contributors) ? p.contributors.length : 0) + (p.creator ? 1 : 0),
-            apiBase: apiBase,
-          }
-        })
-
-        setProjects(mapped)
-        setFilteredProjects(mapped)
-      } catch (err) {
-        console.error('Error fetching projects:', err)
-        setError('Gagal memuat data proyek')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchProjects()
-  }, [])
-
-  // Handle filter dan search
-  useEffect(() => {
-    let filtered = projects
-
-    // Apply filter by status
-    if (activeFilter === 'progress') {
-      filtered = filtered.filter(p => p.statusTone === 'progress')
-    } else if (activeFilter === 'complete') {
-      filtered = filtered.filter(p => p.statusTone === 'complete')
-    }
-
-    // Apply search query
-    if (searchQuery) {
-      filtered = filtered.filter(p =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    }
-
-    setFilteredProjects(filtered)
-  }, [activeFilter, searchQuery, projects])
+  const handleSetSearchQuery = (value) => {
+    setSearchQuery(value)
+    resetPage()
+  }
 
   // Hitung statistik
   const stats = {
-    total: projects.length,
+    total: totalCount || projects.length,
     progress: projects.filter(p => p.statusTone === 'progress').length,
     complete: projects.filter(p => p.statusTone === 'complete').length
   }
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage))
 
   // Handle navigate to detail
   const handleViewDetail = (id_hash) => {
@@ -163,17 +90,27 @@ export default function OurProject() {
 
       <FilterSearch
         activeFilter={activeFilter}
-        setActiveFilter={setActiveFilter}
+        setActiveFilter={handleSetActiveFilter}
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+        setSearchQuery={handleSetSearchQuery}
       />
 
       <ProjectsGrid
         loading={loading}
         error={error}
-        filteredProjects={filteredProjects}
+        filteredProjects={projects}
         onViewDetail={handleViewDetail}
       />
+
+      {!error && totalPages > 1 && (
+        <div className={`max-w-5xl mx-auto px-6 pb-12 ${isTransitioning ? 'opacity-75 pointer-events-none transition-opacity duration-300' : ''}`}>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </div>
+      )}
 
       {/* Footer */}
       <section>

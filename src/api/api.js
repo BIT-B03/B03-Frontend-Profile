@@ -201,8 +201,8 @@ export const getProjectsByCreator = async (creatorHashId) => {
     return response.data;
 };
 
-export const getPublicProjects = async () => {
-    const response = await API.get('/projectPublic/projects');
+export const getPublicProjects = async (params = undefined) => {
+    const response = await API.get('/projectPublic/projects', params ? { params } : undefined);
     return response.data;
 };
 
