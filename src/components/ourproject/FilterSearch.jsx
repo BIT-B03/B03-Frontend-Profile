@@ -20,11 +20,11 @@ export default function FilterSearch({ activeFilter, setActiveFilter, searchQuer
   const completeInactiveClasses = `${inactiveBase} hover:border-filter-sage-border hover:bg-[rgba(34,165,167,0.5)]`
   return (
     <section className="max-w-5xl mx-auto px-6 mb-12">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 bg-gray-900/30 border border-gray-800 rounded-xl p-4 backdrop-blur">
-        <div className="grid grid-cols-3 gap-2 w-full md:w-auto md:flex md:gap-7 md:justify-start">
+      <div className="flex flex-col md:flex-col lg:flex-row lg:justify-between lg:items-center gap-4 bg-gray-900/30 border border-gray-800 rounded-xl p-4 backdrop-blur">
+        <div className="grid grid-cols-3 gap-2 w-full lg:w-auto lg:flex lg:gap-7 lg:justify-start">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`flex items-center gap-1 w-auto justify-center px-1.5 py-1.5 md:px-3 md:py-1.5 md:h-10 text-[10px] md:text-sm rounded-lg font-medium transition border whitespace-nowrap ${
+            className={`flex items-center gap-1 w-auto justify-center px-1.5 py-1.5 md:px-3 md:py-1.5 lg:h-10 text-[10px] md:text-sm rounded-lg font-medium transition border whitespace-nowrap ${
               activeFilter === 'all' ? allActiveClasses : allInactiveClasses
             }`}
           >
@@ -34,7 +34,7 @@ export default function FilterSearch({ activeFilter, setActiveFilter, searchQuer
 
           <button
             onClick={() => setActiveFilter('progress')}
-            className={`flex items-center gap-1 w-auto justify-center px-1.5 py-1.5 md:px-3 md:py-1.5 md:h-10 text-[10px] md:text-sm rounded-lg font-medium transition border whitespace-nowrap ${
+            className={`flex items-center gap-1 w-auto justify-center px-1.5 py-1.5 md:px-3 md:py-1.5 lg:h-10 text-[10px] md:text-sm rounded-lg font-medium transition border whitespace-nowrap ${
               activeFilter === 'progress' ? progressActiveClasses : progressInactiveClasses
             }`}
           >
@@ -44,7 +44,7 @@ export default function FilterSearch({ activeFilter, setActiveFilter, searchQuer
 
           <button
             onClick={() => setActiveFilter('complete')}
-            className={`flex items-center gap-1 w-auto justify-center px-1.5 py-1.5 md:px-3 md:py-1.5 md:h-10 text-[10px] md:text-sm rounded-lg font-medium transition border whitespace-nowrap ${
+            className={`flex items-center gap-1 w-auto justify-center px-1.5 py-1.5 md:px-3 md:py-1.5 lg:h-10 text-[10px] md:text-sm rounded-lg font-medium transition border whitespace-nowrap ${
               activeFilter === 'complete' ? completeActiveClasses : completeInactiveClasses
             }`}
           >
@@ -53,7 +53,7 @@ export default function FilterSearch({ activeFilter, setActiveFilter, searchQuer
           </button>
         </div>
 
-        <div className="relative w-full md:w-auto md:flex-1 md:max-w-sm">
+        <div className="relative w-full lg:flex-1 lg:max-w-sm">
           <div className="relative">
             <input
               type="text"

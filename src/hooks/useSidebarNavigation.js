@@ -52,18 +52,11 @@ export default function useSidebarNavigation({ onClose } = {}) {
         children: [
           { label: 'Kick Request', path: '/member-management/kick-request', iconKey: 'kickRequest', roles: ['superuser', 'admin'] },
           { label: 'Create Kick Request', path: '/member-management/kick-request/create', iconKey: 'createKickRequest', roles: ['superuser', 'admin'] },
+          { label: 'Confirm Pelamar', path: '/member-management/confirm-pelamar', iconKey: 'confirmPelamar', roles: ['superuser', 'admin'] },
           { label: 'Position Role', path: '/member-management/position-role', iconKey: 'positionRole', roles: ['superuser', 'admin'] },
         ],
       },
-      {
-        label: 'Project',
-        iconKey: 'project',
-        children: [
-          { label: 'My Project', path: '/project/my', iconKey: 'myProject', roles: ['superuser', 'admin', 'user'] },
-          { label: 'Create Project', path: '/project/create', iconKey: 'createProject', roles: ['superuser', 'admin', 'user'] },
-          { label: 'Project', path: '/project', iconKey: 'allProject', roles: ['superuser', 'admin'] },
-        ],
-      },
+      { label: 'My Project', path: '/create-project', iconKey: 'project', roles: ['superuser', 'admin', 'user'] },
       { label: 'Settings', path: '/settings', iconKey: 'settings', roles: ['superuser', 'admin'] },
     ];
 
