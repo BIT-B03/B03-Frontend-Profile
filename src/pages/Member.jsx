@@ -18,7 +18,7 @@ import useQueryPagination from '../hooks/useQueryPagination';
 
 const navItems = [
     { label: 'Home', href: '/' },
-    { label: 'Project', href: '#project' },
+    { label: 'Project', href: '/project' },
     { label: 'People', href: '/people' }
 ];
 

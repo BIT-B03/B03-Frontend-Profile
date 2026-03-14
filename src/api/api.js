@@ -235,12 +235,6 @@ export const deleteProject = async (idHash) => {
     return response.data;
 };
 
-export const getProjectAuthThumbnailUrl = (filename) => {
-    if (!filename) return null;
-    const safe = filename.startsWith('/') ? filename.slice(1) : filename;
-    return `/api/project/thumbnails/${safe}`;
-};
-
 // ADMIN SETTINGS
 export const getApplicantRetention = async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;

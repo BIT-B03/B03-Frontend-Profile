@@ -133,14 +133,17 @@ export default function Navbar({
             ) : (
               <>
                 <a
-                  href="#"
-                  onClick={(e) => { e.preventDefault() }}
-                  className="hidden sm:inline-flex items-center justify-center text-sm px-2 py-1 rounded-md md:px-3 md:py-1.5 transition-all duration-200 border border-transparent hover:bg-[rgba(34,165,167,0.45)] hover:border-[#22A5A7] hover:text-pure-white"
+                  href="/register"
+                  onClick={(e) => { e.preventDefault(); navigate('/register') }}
+                  className="inline-flex items-center justify-center text-xs sm:text-sm px-2 py-1 rounded-md md:px-3 md:py-1.5 transition-all duration-200 border border-transparent hover:bg-[rgba(34,165,167,0.45)] hover:border-[#22A5A7] hover:text-pure-white"
                 >
                   Sign in
                 </a>
 
-                <button className="bg-brand-getstarted text-pure-white px-3 py-1.5 rounded-lg transition-all duration-200 hover:opacity-90 font-bold text-xs sm:text-sm relative overflow-hidden btn-flash">
+                <button
+                  onClick={(e) => { e.preventDefault(); navigate('/login') }}
+                  className="bg-brand-getstarted text-pure-white px-3 py-1.5 rounded-lg transition-all duration-200 hover:opacity-90 font-bold text-xs sm:text-sm relative overflow-hidden btn-flash"
+                >
                   <span className="relative z-10">Get Started</span>
                 </button>
               </>

@@ -14,7 +14,7 @@ import ErrorBanner from '../components/ErrorHendler/member/ErrorBanner';
 function App() {
     const navItems = [
         { label: 'Home', href: '/' },
-        { label: 'Project', href: '#project' },
+        { label: 'Project', href: '/project' },
         { label: 'People', href: '/people' }
     ];
     const { userHashedId } = useParams();
