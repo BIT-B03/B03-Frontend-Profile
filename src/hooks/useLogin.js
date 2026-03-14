@@ -57,7 +57,7 @@ export default function useLogin() {
         SetAuthToken(token);
       }
 
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       setErrorMessage(err?.message || 'Gagal login.');
     } finally {

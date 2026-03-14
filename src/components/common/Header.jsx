@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useHeaderUser, { getPositionStyle } from '../../hooks/useHeaderUser';
 import { getAvatarImageUrl } from '../../api/api';
@@ -17,6 +17,9 @@ export default function Header({
 }) {
   const navigate = useNavigate();
   const { username, position, avatarUrl } = useHeaderUser();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+
   const resolvedAvatar = React.useMemo(() => {
     if (!avatarUrl) return null;
     if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://') || avatarUrl.startsWith('/')) {
@@ -25,8 +28,54 @@ export default function Header({
     return getAvatarImageUrl(avatarUrl);
   }, [avatarUrl]);
 
+  // Close popup saat click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    if (profileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [profileOpen]);
+
+  // Close popup saat scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (profileOpen) {
+        setProfileOpen(false);
+      }
+    };
+
+    if (profileOpen) {
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
+  }, [profileOpen]);
+
+  const handleViewProfile = () => {
+    navigate('/profile');
+    setProfileOpen(false);
+  };
+
+  const handleAvatarClick = () => {
+    // Detect if desktop (sm breakpoint = 640px)
+    const isDesktop = window.matchMedia('(min-width: 640px)').matches;
+    
+    if (isDesktop) {
+      // Desktop: direct ke profile
+      navigate('/profile');
+    } else {
+      // Mobile: toggle popup
+      setProfileOpen(!profileOpen);
+    }
+  };
+
   return (
-    <header className="relative rounded-xl px-6 py-4 mb-6 overflow-hidden">
+    <header className="relative rounded-xl px-6 py-4 mb-6">
       <div className="absolute inset-0 bg-gradient-to-r from-brand-1f4c74/40 via-brand-24e1c9/20 to-brand-1f4c74/40 backdrop-blur-xl" />
       <div className="absolute inset-0 border border-brand-24e1c9/30 rounded-xl" />
       
@@ -66,12 +115,13 @@ export default function Header({
           })()}
 
           <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold text-pure-white truncate">{title}</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-pure-white line-clamp-2">{title}</h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col items-end leading-tight min-w-0">
+        <div className="flex items-center gap-3 relative">
+          {/* Desktop: Username & Position - Hidden on mobile */}
+          <div className="hidden sm:flex flex-col items-end leading-tight min-w-0">
             <span className="text-xs sm:text-sm font-semibold text-white/90 truncate max-w-[96px] sm:max-w-[140px]">
               {username}
             </span>
@@ -85,27 +135,74 @@ export default function Header({
             ) : null}
           </div>
 
-          {/* Avatar */}
-          <button
-            onClick={() => navigate('/profile')}
-            className="relative shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-200 group overflow-hidden"
-            style={{
-              background: 'linear-gradient(135deg, rgba(36,225,201,0.25) 0%, rgba(31,76,116,0.5) 100%)',
-              border: '1.5px solid rgba(36,225,201,0.35)',
-              color: '#24e1c9',
-            }}
-            aria-label="Go to profile"
-          >
-            <span
-              className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              style={{ boxShadow: '0 0 0 3px rgba(36,225,201,0.15), 0 0 16px rgba(36,225,201,0.25)' }}
-            />
-            {resolvedAvatar ? (
-              <img src={resolvedAvatar} alt="Avatar" className="w-full h-full object-cover" />
-            ) : (
-              username.charAt(0).toUpperCase()
+          {/* Avatar Button */}
+          <div ref={profileRef} className="relative">
+            <button
+              onClick={handleAvatarClick}
+              className="relative shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-200 group overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, rgba(36,225,201,0.25) 0%, rgba(31,76,116,0.5) 100%)',
+                border: '1.5px solid rgba(36,225,201,0.35)',
+                color: '#24e1c9',
+              }}
+              aria-label="Open profile menu"
+            >
+              <span
+                className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                style={{ boxShadow: '0 0 0 3px rgba(36,225,201,0.15), 0 0 16px rgba(36,225,201,0.25)' }}
+              />
+              {resolvedAvatar ? (
+                <img src={resolvedAvatar} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                username.charAt(0).toUpperCase()
+              )}
+            </button>
+
+            {/* Profile Popup - Mobile Style */}
+            {profileOpen && (
+              <div className="absolute right-0 top-full mt-2 w-64 bg-gray-900/95 border border-brand-24e1c9/30 rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden z-50">
+                {/* Avatar & Info Section */}
+                <div className="p-4 border-b border-gray-800/50">
+                  <div className="flex items-center gap-3">
+                    <div className="relative shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(36,225,201,0.25) 0%, rgba(31,76,116,0.5) 100%)',
+                        border: '1.5px solid rgba(36,225,201,0.35)',
+                        color: '#24e1c9',
+                      }}>
+                      {resolvedAvatar ? (
+                        <img src={resolvedAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        username.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-white truncate">{username}</p>
+                      {position ? (
+                        <span
+                          className="inline-block text-[10px] font-medium tracking-widest uppercase px-1.5 py-0.5 rounded mt-0.5"
+                          style={getPositionStyle(position)}
+                        >
+                          {position}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+
+                {/* View Profile Button */}
+                <button
+                  onClick={handleViewProfile}
+                  className="w-full px-4 py-3 text-sm font-medium text-white hover:bg-white/5 transition flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  View Profile
+                </button>
+              </div>
             )}
-          </button>
+          </div>
         </div>
       </div>
     </header>
