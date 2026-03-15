@@ -51,27 +51,6 @@ export default function usePagedProjectsData({
         return params;
     };
 
-    const applyClientFilters = (list) => {
-        let filtered = list;
-
-        if (activeFilter === 'progress') {
-            filtered = filtered.filter((project) => project.statusTone === 'progress');
-        } else if (activeFilter === 'complete') {
-            filtered = filtered.filter((project) => project.statusTone === 'complete');
-        }
-
-        if (searchTerm && typeof searchTerm === 'string' && searchTerm.trim().length > 0) {
-            const q = searchTerm.trim().toLowerCase();
-            filtered = filtered.filter((project) => {
-                const title = project.title || '';
-                const description = project.description || '';
-                return `${title} ${description}`.toLowerCase().includes(q);
-            });
-        }
-
-        return filtered;
-    };
-
     const cacheKey = JSON.stringify({ activeFilter, searchTerm, itemsPerPage });
 
     const prefetchPage = async (page, expectedKey) => {
@@ -82,11 +61,10 @@ export default function usePagedProjectsData({
             const response = await fetchPage(getParams(page));
             const fetched = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
             const mapped = fetched.map(mapProject);
-            const filtered = applyClientFilters(mapped);
-            const count = typeof response?.count === 'number' ? response.count : filtered.length;
+            const count = response?.meta?.total ?? response?.count ?? mapped.length;
 
             if (cacheRef.current.key !== expectedKey) return;
-            cacheRef.current.pages.set(page, { projects: filtered, count });
+            cacheRef.current.pages.set(page, { projects: mapped, count });
         } catch {
             // ignore prefetch errors
         }
@@ -118,11 +96,10 @@ export default function usePagedProjectsData({
             const response = await fetchPage(getParams(currentPage));
             const fetched = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
             const mapped = fetched.map(mapProject);
-            const filtered = applyClientFilters(mapped);
-            const count = typeof response?.count === 'number' ? response.count : filtered.length;
+            const count = response?.meta?.total ?? response?.count ?? mapped.length;
 
-            cacheRef.current.pages.set(currentPage, { projects: filtered, count });
-            setProjects(filtered);
+            cacheRef.current.pages.set(currentPage, { projects: mapped, count });
+            setProjects(mapped);
             setTotalCount(count);
             setError(null);
 

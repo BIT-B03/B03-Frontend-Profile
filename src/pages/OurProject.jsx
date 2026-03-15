@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/homepage/Footer'
@@ -23,6 +23,7 @@ export default function OurProject() {
 
   const [activeFilter, setActiveFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const { currentPage, setPage, resetPage } = useQueryPagination()
   const itemsPerPage = 12
   const fetchProjectsPage = useCallback((params) => getPublicProjects(params), [])
@@ -37,9 +38,17 @@ export default function OurProject() {
     fetchPage: fetchProjectsPage,
     currentPage,
     activeFilter,
-    searchTerm: searchQuery,
+    searchTerm: debouncedSearch,
     itemsPerPage,
   })
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   const handleSetActiveFilter = (value) => {
     setActiveFilter(value)
