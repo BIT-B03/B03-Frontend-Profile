@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import '../styles/index.css';
 import Navbar from '../components/Navbar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import usePagedMembersData from '../hooks/usePagedMembersData';
 import { getAllUsers } from '../api/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,6 +30,7 @@ const MemberPageContent = () => {
     const [animationKey, setAnimationKey] = useState(0);
     const { currentPage, setPage, resetPage } = useQueryPagination();
     const itemsPerPage = 12;
+    const [debouncedSearch, setDebouncedSearch] = useState('');
 
     const {
         users,
@@ -45,9 +46,17 @@ const MemberPageContent = () => {
         activeFilter,
         selectedGeneration,
         selectedPosition,
-        searchTerm,
+        searchTerm: debouncedSearch,
         itemsPerPage,
     });
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     // Data fetching, caching and prefetching are handled in `usePagedMembersData` hook.
 

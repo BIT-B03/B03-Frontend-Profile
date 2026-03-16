@@ -20,6 +20,7 @@ export default function usePagedMembersData({
 
     const cacheRef = useRef({ key: '', pages: new Map() });
     const abortControllerRef = useRef(null);
+    const inFlightRef = useRef(new Map());
 
     const buildGenerationList = (list) => ([...new Set(
         list
@@ -93,21 +94,28 @@ export default function usePagedMembersData({
     };
 
     const prefetchPage = async (page, expectedKey) => {
-        try {
-            if (cacheRef.current.pages.has(page)) return;
-            if (cacheRef.current.key !== expectedKey) return;
+        const fetchKey = JSON.stringify(getParams(page));
+        if (cacheRef.current.pages.has(page) || inFlightRef.current.has(fetchKey)) return;
+        if (cacheRef.current.key !== expectedKey) return;
 
-            const response = await fetchPage(getParams(page));
-            const fetched = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
-            const filtered = applyClientSearchFilter(fetched);
-            const count = typeof response?.count === 'number' ? response.count : filtered.length;
-            const generationList = response?.generations ?? response?.meta?.generations ?? null;
+        const prefetchPromise = (async () => {
+            try {
+                const response = await fetchPage(getParams(page));
+                const fetched = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
+                const filtered = applyClientSearchFilter(fetched);
+                const count = typeof response?.count === 'number' ? response.count : filtered.length;
+                const generationList = response?.generations ?? response?.meta?.generations ?? null;
 
-            if (cacheRef.current.key !== expectedKey) return;
-            cacheRef.current.pages.set(page, { users: filtered, count, generationList });
-        } catch {
-            // ignore prefetch errors
-        }
+                if (cacheRef.current.key === expectedKey) {
+                    cacheRef.current.pages.set(page, { users: filtered, count, generationList });
+                }
+            } catch {
+                // ignore prefetch errors
+            } finally {
+                inFlightRef.current.delete(fetchKey);
+            }
+        })();
+        inFlightRef.current.set(fetchKey, prefetchPromise);
     };
 
     const cacheKey = JSON.stringify({ activeFilter, selectedGeneration, selectedPosition, searchTerm, itemsPerPage });
@@ -142,7 +150,22 @@ export default function usePagedMembersData({
                 setIsTransitioning(true);
             }
 
-            const response = await fetchPage(getParams(currentPage));
+            const fetchKey = JSON.stringify(getParams(currentPage));
+            let responsePromise = inFlightRef.current.get(fetchKey);
+
+            if (!responsePromise) {
+                responsePromise = (async () => {
+                    try {
+                        // Pass signal to the actual fetch function if it supports it
+                        return await fetchPage(getParams(currentPage), { signal });
+                    } finally {
+                        inFlightRef.current.delete(fetchKey);
+                    }
+                })();
+                inFlightRef.current.set(fetchKey, responsePromise);
+            }
+
+            const response = await responsePromise;
             if (signal.aborted) return;
 
             const fetchedUsers = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
