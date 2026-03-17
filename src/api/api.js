@@ -206,6 +206,11 @@ export const getPublicProjects = async (params = undefined) => {
     return response.data;
 };
 
+export const getPublicProjectStats = async () => {
+    const response = await API.get('/projectPublic/projects/stats');
+    return response.data;
+};
+
 export const getInvitedProjects = async () => {
     const response = await API.get('/project/projects/invited');
     return response.data;

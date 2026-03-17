@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import '../styles/index.css';
 import Navbar from '../components/Navbar';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import usePagedMembersData from '../hooks/usePagedMembersData';
 import { getAllUsers } from '../api/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +15,7 @@ import BackgroundLayout from '../components/layout/GuestMemberBackground';
 import { GRID_CLASSES } from '../components/member/common/ImageWithSkeleton';
 import Pagination from '../components/filter/Pagination';
 import useQueryPagination from '../hooks/useQueryPagination';
+import useDebouncedValue from '../hooks/useDebouncedValue';
 
 const navItems = [
     { label: 'Home', href: '/' },
@@ -30,7 +31,7 @@ const MemberPageContent = () => {
     const [animationKey, setAnimationKey] = useState(0);
     const { currentPage, setPage, resetPage } = useQueryPagination();
     const itemsPerPage = 12;
-    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const debouncedSearch = useDebouncedValue(searchTerm, 500);
 
     const {
         users,
@@ -49,14 +50,6 @@ const MemberPageContent = () => {
         searchTerm: debouncedSearch,
         itemsPerPage,
     });
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearch(searchTerm);
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [searchTerm]);
 
     // Data fetching, caching and prefetching are handled in `usePagedMembersData` hook.
 
