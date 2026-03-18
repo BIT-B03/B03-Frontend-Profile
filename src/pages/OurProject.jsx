@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/homepage/Footer'
@@ -7,9 +7,7 @@ import StatsSection from '../components/ourproject/StatsSection'
 import FilterSearch from '../components/ourproject/FilterSearch'
 import ProjectsGrid from '../components/ourproject/ProjectsGrid'
 import Pagination from '../components/filter/Pagination'
-import useQueryPagination from '../hooks/useQueryPagination'
-import usePagedProjectsData from '../hooks/usePagedProjectsData'
-import { getPublicProjects } from '../api/api'
+import useOurProjectPageData from '../hooks/useOurProjectPageData'
 
 export default function OurProject() {
   const navigate = useNavigate()
@@ -21,53 +19,20 @@ export default function OurProject() {
     { label: 'People', href: '/people' }
   ]
 
-  const [activeFilter, setActiveFilter] = useState('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
-  const { currentPage, setPage, resetPage } = useQueryPagination()
-  const itemsPerPage = 12
-  const fetchProjectsPage = useCallback((params) => getPublicProjects(params), [])
-
   const {
+    activeFilter,
+    searchQuery,
+    stats,
     projects,
-    totalCount,
     loading,
     isTransitioning,
     error,
-  } = usePagedProjectsData({
-    fetchPage: fetchProjectsPage,
     currentPage,
-    activeFilter,
-    searchTerm: debouncedSearch,
-    itemsPerPage,
-  })
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery)
-    }, 500)
-
-    return () => clearTimeout(timer)
-  }, [searchQuery])
-
-  const handleSetActiveFilter = (value) => {
-    setActiveFilter(value)
-    resetPage()
-  }
-
-  const handleSetSearchQuery = (value) => {
-    setSearchQuery(value)
-    resetPage()
-  }
-
-  // Hitung statistik
-  const stats = {
-    total: totalCount || projects.length,
-    progress: projects.filter(p => p.statusTone === 'progress').length,
-    complete: projects.filter(p => p.statusTone === 'complete').length
-  }
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage))
+    setPage,
+    totalPages,
+    handleSetActiveFilter,
+    handleSetSearchQuery,
+  } = useOurProjectPageData({ itemsPerPage: 12, debounceMs: 500 })
 
   // Handle navigate to detail
   const handleViewDetail = (id_hash) => {
