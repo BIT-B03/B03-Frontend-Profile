@@ -1,4 +1,6 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import ImageWithSkeleton from '../member/common/ImageWithSkeleton';
 import ImageCropModal from '../common/ImageCropModal';
 
@@ -9,6 +11,7 @@ export default function PositionRolePhotoField({
     disabled,
     isUploading,
     error,
+    successMessage,
     onPickFile,
     onDeleteFile,
 }) {
@@ -94,6 +97,21 @@ export default function PositionRolePhotoField({
                                 {error}
                             </div>
                         )}
+
+                        <AnimatePresence>
+                            {successMessage && !error && (
+                                <motion.div
+                                    key="photo-success"
+                                    initial={{ opacity: 0, y: -6 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -6 }}
+                                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                                    className="mt-3 inline-flex w-fit rounded-xl border border-brand-24e1c9/60 bg-brand-24e1c9/10 px-3 py-2.5 text-sm text-brand-24e1c9"
+                                >
+                                    {successMessage}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         <div className="mt-4 flex items-center gap-3">
                             <input
