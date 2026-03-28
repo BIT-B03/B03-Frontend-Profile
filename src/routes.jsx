@@ -25,6 +25,7 @@ import Profile from './pages/Profile.jsx';
 import CreateProject from './pages/CreateProject.jsx';
 import DetailProjectCreate from './pages/DetailProjectCreate.jsx';
 import Settings from './pages/Settings.jsx';
+import Contact from './pages/Contact.jsx';
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -49,6 +50,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path="login" element={<LoginPage />} />
                     <Route path="project" element={<OurProject />} />
                     <Route path="projects/:projectHashedId" element={<DetailProject />} />
+                    <Route path="contact" element={<Contact />} />
                     <Route path="reset-password" element={<ResetPasswordPage />} />
                     <Route path="forgot-password" element={<Navigate to="/reset-password" replace />} />
                     <Route path="error" element={<ErrorHandlerPage />} />

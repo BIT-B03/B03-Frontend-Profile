@@ -40,7 +40,7 @@ const PreviewGallery = ({ previews = [], title, description, showTitleAndDescrip
                             const url = getProjectPreviewImageUrl(preview?.filename || preview?.preview);
                             return (
                                 <SwiperSlide key={idx}>
-                                    <div className="relative w-full aspect-video max-h-[520px] bg-brand-fill/30">
+                                    <div className="relative w-full aspect-video bg-brand-fill/30">
                                         {url ? (
                                             <img
                                                 src={url}

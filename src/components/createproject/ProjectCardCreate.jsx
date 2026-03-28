@@ -45,7 +45,7 @@ export default function ProjectCardCreate({ project, onViewDetail, onEdit, onDel
   return (
     <div className="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden hover:border-blue-500/50 transition group h-full flex flex-col w-full max-w-sm">
       {/* ── Thumbnail ──────────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden h-40 bg-gradient-to-br from-gray-800 to-gray-900">
+      <div className="relative overflow-hidden aspect-video bg-gradient-to-br from-gray-800 to-gray-900">
         {project.thumbnail_url ? (
           <img
             src={project.thumbnail_url}

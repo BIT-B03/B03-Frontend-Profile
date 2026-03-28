@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import BlurFrame, { CloseButton } from '../common/BlurFrame';
 import PositionRoleProfileCard from './PositionRoleProfileCard';
 import PositionRoleFields from './PositionRoleFields';
@@ -18,17 +18,45 @@ export default function PositionRoleModal({ isOpen, member, formState, onChange,
     const [photoPreviewUrl, setPhotoPreviewUrl] = useState(null);
     const [photoUploading, setPhotoUploading] = useState(false);
     const [photoError, setPhotoError] = useState(null);
+    const [photoSuccessMessage, setPhotoSuccessMessage] = useState(null);
+    const successTimerRef = useRef(null);
 
     useEffect(() => {
         if (!isOpen) return;
         setPhotoError(null);
+        setPhotoSuccessMessage(null);
+        if (successTimerRef.current) {
+            clearTimeout(successTimerRef.current);
+            successTimerRef.current = null;
+        }
         setPhotoUploading(false);
         setPhotoPreviewUrl(null);
     }, [isOpen, member?.hashed_id]);
 
     useEffect(() => {
+        if (!photoSuccessMessage) return undefined;
+        if (successTimerRef.current) {
+            clearTimeout(successTimerRef.current);
+        }
+        successTimerRef.current = setTimeout(() => {
+            setPhotoSuccessMessage(null);
+            successTimerRef.current = null;
+        }, 3000);
+        return () => {
+            if (successTimerRef.current) {
+                clearTimeout(successTimerRef.current);
+                successTimerRef.current = null;
+            }
+        };
+    }, [photoSuccessMessage]);
+
+    useEffect(() => {
         return () => {
             if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+            if (successTimerRef.current) {
+                clearTimeout(successTimerRef.current);
+                successTimerRef.current = null;
+            }
         };
     }, [photoPreviewUrl]);
 
@@ -71,6 +99,7 @@ export default function PositionRoleModal({ isOpen, member, formState, onChange,
     const handlePickPhoto = async (file, validationError) => {
         if (validationError) {
             setPhotoError(validationError);
+            setPhotoSuccessMessage(null);
             return;
         }
         if (!file || !member?.hashed_id) return;
@@ -82,6 +111,7 @@ export default function PositionRoleModal({ isOpen, member, formState, onChange,
         try {
             setPhotoUploading(true);
             setPhotoError(null);
+            setPhotoSuccessMessage(null);
             const hasDisplay = Boolean(profile?.display_url || member?.display_url);
             if (hasDisplay) {
                 await editMemberDisplay(member.hashed_id, file);
@@ -96,6 +126,7 @@ export default function PositionRoleModal({ isOpen, member, formState, onChange,
                 onMemberPatched(member.hashed_id, { display_url: data?.display_url ?? null });
             }
 
+            setPhotoSuccessMessage('Display photo updated.');
             setPhotoPreviewUrl(null);
         } catch (err) {
             console.error('Failed to upload member photo', err);
@@ -110,6 +141,7 @@ export default function PositionRoleModal({ isOpen, member, formState, onChange,
         try {
             setPhotoUploading(true);
             setPhotoError(null);
+            setPhotoSuccessMessage(null);
             await deleteMemberDisplay(member.hashed_id);
             const fresh = await getAdminMemberDetail(member.hashed_id);
             const data = fresh?.data ?? fresh ?? null;
@@ -154,6 +186,7 @@ export default function PositionRoleModal({ isOpen, member, formState, onChange,
                     photoDisabled={isSaving}
                     photoIsUploading={photoUploading}
                     photoError={photoError}
+                    photoSuccessMessage={photoSuccessMessage}
                     onPickPhoto={handlePickPhoto}
                     onDeletePhoto={handleDeletePhoto}
                     disabled={isSaving}

@@ -7,10 +7,12 @@ import {
   getProjectThumbnailImageUrl,
   getProjectPreviewImageUrl,
 } from '../../api/api'
+import ImageCropModal from '../common/ImageCropModal'
+import useImageCropQueue from '../../hooks/useImageCropQueue'
 
 const STATUS_OPTIONS = [
   { value: 'on_progress', label: 'On Progress' },
-  { value: 'completed',   label: 'Complete'    },
+  { value: 'completed', label: 'Complete' },
 ]
 
 const buildObjectUrl = (file) => (file ? URL.createObjectURL(file) : null)
@@ -18,41 +20,41 @@ const buildObjectUrl = (file) => (file ? URL.createObjectURL(file) : null)
 const normalizeStatusValue = (raw = '') => {
   const s = raw.toLowerCase()
   if (s === 'on_progress' || s === 'progress' || s === 'on progress') return 'on_progress'
-  if (s === 'completed'   || s === 'complete')                         return 'completed'
+  if (s === 'completed' || s === 'complete') return 'completed'
   return 'on_progress'
 }
 
 export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess }) {
   /* ── form fields ──────────────────────────────────────────────────────── */
-  const [title,            setTitle]            = useState('')
-  const [description,      setDescription]      = useState('')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
   const [shortDescription, setShortDescription] = useState('')
-  const [status,           setStatus]           = useState('on_progress')
+  const [status, setStatus] = useState('on_progress')
 
   /* ── thumbnail ────────────────────────────────────────────────────────── */
-  const [thumbFile,       setThumbFile]       = useState(null)    // new File
-  const [thumbObjUrl,     setThumbObjUrl]     = useState(null)    // Object URL for new file
-  const [existingThumb,   setExistingThumb]   = useState(null)    // filename from server
+  const [thumbFile, setThumbFile] = useState(null)    // new File
+  const [thumbObjUrl, setThumbObjUrl] = useState(null)    // Object URL for new file
+  const [existingThumb, setExistingThumb] = useState(null)    // filename from server
 
   /* ── previews ─────────────────────────────────────────────────────────── */
-  const [existingPreviews,  setExistingPreviews]  = useState([])   // filenames from server
+  const [existingPreviews, setExistingPreviews] = useState([])   // filenames from server
   // Single array of { file: File, url: string } — keeps files & URLs always in sync
-  const [newPreviews,       setNewPreviews]       = useState([])   // { file, url }[]
-  const [previewsModified,  setPreviewsModified]  = useState(false)
+  const [newPreviews, setNewPreviews] = useState([])   // { file, url }[]
+  const [previewsModified, setPreviewsModified] = useState(false)
 
   /* ── contributors ─────────────────────────────────────────────────────── */
-  const [users,            setUsers]            = useState([])
+  const [users, setUsers] = useState([])
   const [selectedContribs, setSelectedContribs] = useState([])    // hashed_id[]
-  const [contribDropOpen,  setContribDropOpen]  = useState(false)
-  const [contribSearch,    setContribSearch]    = useState('')
+  const [contribDropOpen, setContribDropOpen] = useState(false)
+  const [contribSearch, setContribSearch] = useState('')
   const contribRef = useRef(null)
 
   /* ── misc ─────────────────────────────────────────────────────────────── */
-  const [loadingData,  setLoadingData]  = useState(false)
+  const [loadingData, setLoadingData] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error,        setError]        = useState(null)
+  const [error, setError] = useState(null)
 
-  const thumbInputRef   = useRef(null)
+  const thumbInputRef = useRef(null)
   const previewInputRef = useRef(null)
 
   /* ── fetch project + users when modal opens ───────────────────────────── */
@@ -83,7 +85,7 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
         // Authenticated API returns key 'preview' (array of objects with .filename)
         const previews = Array.isArray(p.preview) ? p.preview
           : Array.isArray(p.previews) ? p.previews
-          : []
+            : []
         setExistingPreviews(
           previews
             .map((pr) => {
@@ -103,9 +105,9 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
           contribs
             .map((c) =>
               c.user?.hashed_id ||
-              c.user?.id_hash   ||
-              c.hashed_id       ||
-              c.id_hash         ||
+              c.user?.id_hash ||
+              c.hashed_id ||
+              c.id_hash ||
               null
             )
             .filter(Boolean)
@@ -160,8 +162,40 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const handleCropResult = useCallback((croppedFile, target) => {
+    if (target === 'thumbnail') {
+      if (thumbObjUrl) URL.revokeObjectURL(thumbObjUrl)
+      setThumbFile(croppedFile)
+      setThumbObjUrl(buildObjectUrl(croppedFile))
+      setExistingThumb(null)
+      return
+    }
+
+    if (target === 'preview') {
+      const url = buildObjectUrl(croppedFile)
+      setNewPreviews((prev) => [...prev, { file: croppedFile, url }])
+      setPreviewsModified(true)
+    }
+  }, [thumbObjUrl])
+
+  const {
+    modalProps: cropModalProps,
+    openCrop,
+    openCropQueue,
+    closeCrop,
+  } = useImageCropQueue({
+    aspect: 16 / 9,
+    cropShape: 'rect',
+    showGrid: true,
+    title: 'Crop Image',
+    subtitle: 'Adjust the frame for a 16:9 crop.',
+    saveLabel: 'Use Image',
+    onCropped: handleCropResult,
+  })
+
   const handleClose = () => {
     if (isSubmitting) return
+    closeCrop()
     resetForm()
     onClose()
   }
@@ -169,10 +203,7 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
   /* ── thumbnail ────────────────────────────────────────────────────────── */
   const handleThumbnailChange = (file) => {
     if (!file) return
-    if (thumbObjUrl) URL.revokeObjectURL(thumbObjUrl)
-    setThumbFile(file)
-    setThumbObjUrl(buildObjectUrl(file))
-    setExistingThumb(null)
+    openCrop(file, 'thumbnail')
   }
 
   const onThumbDrop = (e) => {
@@ -183,11 +214,7 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
 
   /* ── preview images ───────────────────────────────────────────────────── */
   const addPreviewFiles = (files) => {
-    const arr = Array.from(files)
-    if (!arr.length) return
-    const entries = arr.map((file) => ({ file, url: buildObjectUrl(file) }))
-    setNewPreviews((prev) => [...prev, ...entries])
-    setPreviewsModified(true)
+    openCropQueue(files, 'preview')
   }
 
   const removeNewPreview = (idx) => {
@@ -202,6 +229,7 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
     setExistingPreviews((prev) => prev.filter((_, i) => i !== idx))
     setPreviewsModified(true)
   }
+
 
   const onPreviewDrop = (e) => {
     e.preventDefault()
@@ -406,9 +434,8 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                                   <button
                                     type="button"
                                     onClick={() => toggleContrib(u.hashed_id)}
-                                    className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm transition-colors ${
-                                      selected ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'
-                                    }`}
+                                    className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm transition-colors ${selected ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                                      }`}
                                   >
                                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                       {(u.name || u.username || '?')[0].toUpperCase()}
@@ -622,6 +649,7 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
           </motion.div>
         </div>
       )}
+      <ImageCropModal {...cropModalProps} />
     </AnimatePresence>
   )
 }

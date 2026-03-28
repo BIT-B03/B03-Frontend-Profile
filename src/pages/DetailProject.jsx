@@ -83,7 +83,7 @@ function DetailProject() {
                     <div className="grid grid-cols-1 lg:[grid-template-columns:320px_1fr] gap-5 items-stretch">
                         <div className="flex justify-center lg:justify-start">
                             <div className="bg-brand-fill border border-brand-stroke rounded-3xl p-4 shadow-2xl max-w-[320px] w-full h-[480px] skeleton-base skeleton-shimmer">
-                                <div className="w-full aspect-[4/6] rounded-2xl" />
+                                <div className="w-full aspect-video rounded-2xl" />
                             </div>
                         </div>
 
@@ -139,7 +139,7 @@ function DetailProject() {
 
                         {projectData?.preview && projectData.preview.length > 0 && (
                             <div>
-                                <PreviewGallery 
+                                <PreviewGallery
                                     previews={projectData.preview}
                                     title={projectData?.title}
                                     description={projectData?.description}

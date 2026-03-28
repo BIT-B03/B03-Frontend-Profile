@@ -9,7 +9,7 @@ const ProjectPreviewCard = ({ thumbnail, title }) => {
         <div className="bg-brand-fill border border-brand-stroke rounded-3xl p-4 shadow-2xl max-w-[320px] w-full h-[480px]">
             <div className="relative">
                 {/* Project Image */}
-                <div className="relative w-full aspect-[4/6] rounded-2xl overflow-hidden shadow-inner">
+                <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-inner">
                     {imageSrc ? (
                         <img
                             src={imageSrc}
