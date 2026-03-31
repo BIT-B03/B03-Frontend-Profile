@@ -1,11 +1,11 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
-import HeroSection from '../components/homepage/HeroSection'
-import BusinessSection from '../components/homepage/BusinessSection'
-import WhyChooseUs from '../components/homepage/WhyChooseUs'
+import AboutHeroSection from '../components/about/AboutHeroSection'
+import MissionVisionSection from '../components/about/MissionVisionSection'
+import TeamValuesSection from '../components/about/TeamValuesSection'
 import Footer from '../components/homepage/Footer'
 
-export default function HomePage() {
+export default function AboutPage() {
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
@@ -17,16 +17,18 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-black to-black text-white">
       <Navbar navItems={navItems} />
-      <section>
-        <HeroSection />
-      </section>
       
+      <section>
+        <AboutHeroSection />
+      </section>
+
       <main className="max-w-5xl mx-auto px-6">
         <section>
-          <BusinessSection />
+          <MissionVisionSection />
         </section>
+
         <section>
-          <WhyChooseUs />
+          <TeamValuesSection />
         </section>
       </main>
 

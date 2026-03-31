@@ -16,6 +16,7 @@ import DetailProject from './pages/DetailProject.jsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import ErrorHandlerPage from './pages/ErrorHandlerPage.jsx';
 import NotFoundRedirect from './pages/NotFoundRedirect.jsx';
+import AboutPage from './pages/AboutPage.jsx';
 import ProtectedRoute from './utils/ProtectRoute';
 import KickRequests from './pages/KickRequests.jsx';
 import CreateKickRequest from './pages/CreateKickRequest.jsx';
@@ -51,6 +52,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path="project" element={<OurProject />} />
                     <Route path="projects/:projectHashedId" element={<DetailProject />} />
                     <Route path="contact" element={<Contact />} />
+                    <Route path="about" element={<AboutPage />} />
                     <Route path="reset-password" element={<ResetPasswordPage />} />
                     <Route path="forgot-password" element={<Navigate to="/reset-password" replace />} />
                     <Route path="error" element={<ErrorHandlerPage />} />
