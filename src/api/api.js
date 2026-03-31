@@ -39,6 +39,14 @@ API.interceptors.response.use(
         const status = error?.response?.status;
 
         if (status === 401) {
+            const serverMessage =
+                error?.response?.data?.message ||
+                'Sesi Anda mungkin telah berakhir. Silakan login kembali.';
+            try {
+                sessionStorage.setItem('auth_expired_message', String(serverMessage));
+            } catch {
+                // ignore storage errors
+            }
             localStorage.removeItem("auth_access_token");
             localStorage.removeItem("username");
             localStorage.removeItem("hashed_id");
@@ -47,7 +55,7 @@ API.interceptors.response.use(
 
             ClearAuthToken();
             if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
-                window.location.replace("/error");
+                window.location.replace("/login");
             }
         }
 

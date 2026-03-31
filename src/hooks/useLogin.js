@@ -1,15 +1,32 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Login, SetAuthToken } from '../api/api';
 
 const AUTH_TOKEN_KEY = 'auth_access_token';
 
 export default function useLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    const stateMessage = location?.state?.message;
+    let storedMessage = '';
+    try {
+      storedMessage = sessionStorage.getItem('auth_expired_message') || '';
+      if (storedMessage) sessionStorage.removeItem('auth_expired_message');
+    } catch {
+      // ignore storage errors
+    }
+
+    const nextMessage = stateMessage || storedMessage;
+    if (nextMessage) {
+      setErrorMessage(String(nextMessage));
+    }
+  }, [location?.state]);
 
   const validate = () => {
     if (!username.trim()) return 'Username wajib diisi.';
