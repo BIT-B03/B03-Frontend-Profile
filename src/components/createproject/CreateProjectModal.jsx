@@ -1,12 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { createProject, getAllUsers } from '../../api/api'
-import ImageCropModal from '../common/ImageCropModal'
-import useImageCropQueue from '../../hooks/useImageCropQueue'
 
 const STATUS_OPTIONS = [
   { value: 'on_progress', label: 'On Progress' },
-  { value: 'completed', label: 'Complete' },
+  { value: 'completed',   label: 'Complete'    },
 ]
 
 /* ── tiny helpers ─────────────────────────────────────────────────────────── */
@@ -15,28 +13,26 @@ const buildObjectUrl = (file) => file ? URL.createObjectURL(file) : null
 export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
   /* ── form fields ──────────────────────────────────────────────────────── */
   const [title,            setTitle]            = useState('')
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
   const [shortDescription, setShortDescription] = useState('')
-  const [status, setStatus] = useState('on_progress')
-  const [thumbnail, setThumbnail] = useState(null)       // File
+  const [status,           setStatus]           = useState('on_progress')
+  const [thumbnail,        setThumbnail]        = useState(null)       // File
   const [thumbnailPreview, setThumbnailPreview] = useState(null)       // ObjectURL
-  const [previews, setPreviews] = useState([])         // File[]
-  const [previewUrls, setPreviewUrls] = useState([])         // ObjectURL[]
+  const [previews,         setPreviews]         = useState([])         // File[]
+  const [previewUrls,      setPreviewUrls]      = useState([])         // ObjectURL[]
 
   /* ── contributor selection ────────────────────────────────────────────── */
-  const [users, setUsers] = useState([])
-  const [selectedContribs, setSelectedContribs] = useState([])        // hashed_id[]
-  const [contribDropOpen, setContribDropOpen] = useState(false)
-  const [contribSearch, setContribSearch] = useState('')
+  const [users,             setUsers]             = useState([])
+  const [selectedContribs,  setSelectedContribs]  = useState([])        // hashed_id[]
+  const [contribDropOpen,   setContribDropOpen]   = useState(false)
+  const [contribSearch,     setContribSearch]     = useState('')
   const contribRef = useRef(null)
 
   /* ── misc ─────────────────────────────────────────────────────────────── */
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState(null)
+  const [error,        setError]        = useState(null)
 
-  const thumbInputRef = useRef(null)
-  const previewInputRef = useRef(null)
+  const thumbInputRef    = useRef(null)
+  const previewInputRef  = useRef(null)
 
   /* ── fetch users once modal opens ────────────────────────────────────── */
   useEffect(() => {
@@ -46,7 +42,7 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
         const list = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []
         setUsers(list)
       })
-      .catch(() => { })
+      .catch(() => {})
   }, [isOpen])
 
   /* ── close contrib dropdown on outside click ──────────────────────────── */
@@ -71,7 +67,7 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
       if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview)
       previewUrls.forEach((u) => URL.revokeObjectURL(u))
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   /* ── reset form ───────────────────────────────────────────────────────── */
@@ -88,42 +84,11 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
     setSelectedContribs([])
     setContribSearch('')
     setError(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const handleCropResult = useCallback((croppedFile, target) => {
-    if (target === 'thumbnail') {
-      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview)
-      setThumbnail(croppedFile)
-      setThumbnailPreview(buildObjectUrl(croppedFile))
-      return
-    }
-
-    if (target === 'preview') {
-      const url = buildObjectUrl(croppedFile)
-      setPreviews((prev) => [...prev, croppedFile])
-      setPreviewUrls((prev) => [...prev, url])
-    }
-  }, [thumbnailPreview])
-
-  const {
-    modalProps: cropModalProps,
-    openCrop,
-    openCropQueue,
-    closeCrop,
-  } = useImageCropQueue({
-    aspect: 16 / 9,
-    cropShape: 'rect',
-    showGrid: true,
-    title: 'Crop Image',
-    subtitle: 'Adjust the frame for a 16:9 crop.',
-    saveLabel: 'Use Image',
-    onCropped: handleCropResult,
-  })
 
   const handleClose = () => {
     if (isSubmitting) return
-    closeCrop()
     resetForm()
     onClose()
   }
@@ -131,7 +96,9 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
   /* ── thumbnail ────────────────────────────────────────────────────────── */
   const handleThumbnailChange = (file) => {
     if (!file) return
-    openCrop(file, 'thumbnail')
+    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview)
+    setThumbnail(file)
+    setThumbnailPreview(buildObjectUrl(file))
   }
 
   const onThumbDrop = (e) => {
@@ -142,7 +109,11 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
 
   /* ── preview images ───────────────────────────────────────────────────── */
   const addPreviewFiles = (files) => {
-    openCropQueue(files, 'preview')
+    const arr = Array.from(files)
+    if (!arr.length) return
+    const urls = arr.map(buildObjectUrl)
+    setPreviews((prev) => [...prev, ...arr])
+    setPreviewUrls((prev) => [...prev, ...urls])
   }
 
   const removePreview = (idx) => {
@@ -150,7 +121,6 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
     setPreviews((prev) => prev.filter((_, i) => i !== idx))
     setPreviewUrls((prev) => prev.filter((_, i) => i !== idx))
   }
-
 
   const onPreviewDrop = (e) => {
     e.preventDefault()
@@ -171,7 +141,7 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
     if (u.hashed_id === myHashedId) return false
     const q = contribSearch.toLowerCase()
     return (
-      (u.name || '').toLowerCase().includes(q) ||
+      (u.name     || '').toLowerCase().includes(q) ||
       (u.username || '').toLowerCase().includes(q)
     )
   })
@@ -193,11 +163,9 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
       const fd = new FormData()
       fd.append('title',             title.trim())
       fd.append('description',       '')
-      fd.append('title', title.trim())
-      fd.append('description', description.trim())
       fd.append('short_description', shortDescription.trim())
-      fd.append('status', status)
-      fd.append('created_by', creatorHashedId)
+      fd.append('status',            status)
+      fd.append('created_by',    creatorHashedId)
       // Kirim sebagai JSON string agar _normalize_contributors bisa parse semua value
       fd.append('contributors', JSON.stringify(selectedContribs))
       if (thumbnail) fd.append('thumbnail', thumbnail)
@@ -504,7 +472,6 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
           </motion.div>
         </div>
       )}
-      <ImageCropModal {...cropModalProps} />
     </AnimatePresence>
   )
 }
