@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import {
-  getAllUsers,
-  getProjectDetail,
-  editProject,
   getProjectThumbnailImageUrl,
   getProjectPreviewImageUrl,
 } from '../../api/api'
+import useEditProjectModal from '../../hooks/useEditProjectModal'
 import ImageCropModal from '../common/ImageCropModal'
 import useImageCropQueue from '../../hooks/useImageCropQueue'
 
@@ -15,6 +14,46 @@ const STATUS_OPTIONS = [
   { value: 'completed', label: 'Complete' },
 ]
 
+export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess }) {
+  const navigate = useNavigate()
+  const {
+    title,
+    setTitle,
+    description,
+    shortDescription,
+    setShortDescription,
+    status,
+    setStatus,
+    thumbFile,
+    thumbObjUrl,
+    existingThumb,
+    existingPreviews,
+    newPreviews,
+    previewsModified,
+    users,
+    selectedContribs,
+    contribDropOpen,
+    setContribDropOpen,
+    contribSearch,
+    setContribSearch,
+    contribRef,
+    loadingData,
+    isSubmitting,
+    error,
+    thumbInputRef,
+    previewInputRef,
+    handleClose,
+    handleThumbnailChange,
+    onThumbDrop,
+    addPreviewFiles,
+    removeNewPreview,
+    removeExistingPreview,
+    onPreviewDrop,
+    toggleContrib,
+    filteredUsers,
+    handleSubmit,
+    selectedLabels,
+  } = useEditProjectModal({ isOpen, projectId, onClose, onSuccess })
 const buildObjectUrl = (file) => (file ? URL.createObjectURL(file) : null)
 
 const normalizeStatusValue = (raw = '') => {
@@ -305,8 +344,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
     .map((u) => u.name || u.username)
 
   const currentThumbSrc = thumbObjUrl || (existingThumb ? getProjectThumbnailImageUrl(existingThumb) : null)
-
-  /* ── render ───────────────────────────────────────────────────────────── */
   return (
     <AnimatePresence>
       {isOpen && (
@@ -318,7 +355,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 shrink-0">
               <h2 className="text-base font-semibold text-white">Edit Project</h2>
               <button
@@ -332,7 +368,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
               </button>
             </div>
 
-            {/* Loading state */}
             {loadingData ? (
               <div className="flex items-center justify-center py-20 text-gray-400 text-sm">
                 <svg className="w-5 h-5 animate-spin mr-2" fill="none" viewBox="0 0 24 24">
@@ -344,8 +379,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
                 <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4">
-
-                  {/* Title */}
                   <Field label="Title Project" required>
                     <input
                       value={title}
@@ -356,19 +389,28 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                     />
                   </Field>
 
-                  {/* Description */}
                   <Field label="Description Project">
-                    <textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Enter project description"
-                      rows={3}
-                      className={`${inputCls} resize-none`}
-                      disabled={isSubmitting}
-                    />
+                    <div className="rounded-xl border border-gray-700 bg-gray-800/50 p-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-xs text-gray-400">
+                          Edit deskripsi di halaman khusus agar lebih leluasa.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!projectId) return
+                            handleClose()
+                            navigate(`/create-project/${projectId}/edit-description`)
+                          }}
+                          disabled={isSubmitting}
+                          className="px-3 py-1.5 rounded-lg bg-brand-24e1c9 hover:bg-brand-24e1c9/80 text-gray-900 text-xs font-semibold transition disabled:opacity-60"
+                        >
+                          Edit Description
+                        </button>
+                      </div>
+                    </div>
                   </Field>
 
-                  {/* Short Description */}
                   <Field label="Short Description">
                     <input
                       value={shortDescription}
@@ -379,7 +421,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                     />
                   </Field>
 
-                  {/* Status */}
                   <Field label="Status">
                     <select
                       value={status}
@@ -393,7 +434,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                     </select>
                   </Field>
 
-                  {/* Contributor */}
                   <Field label="Contributor">
                     <div className="relative" ref={contribRef}>
                       <button
@@ -470,7 +510,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                     </div>
                   </Field>
 
-                  {/* Thumbnail */}
                   <Field label="Thumbnail">
                     <input
                       ref={thumbInputRef}
@@ -516,7 +555,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                     </div>
                   </Field>
 
-                  {/* Preview Images */}
                   <Field label="Preview Images">
                     <input
                       ref={previewInputRef}
@@ -559,7 +597,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                       </button>
                     </div>
 
-                    {/* Existing previews */}
                     {existingPreviews.length > 0 && (
                       <div className="mt-2">
                         <p className="text-[10px] text-gray-500 mb-1.5">Current previews</p>
@@ -584,7 +621,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                       </div>
                     )}
 
-                    {/* New previews */}
                     {newPreviews.length > 0 && (
                       <div className="mt-2">
                         <p className="text-[10px] text-gray-500 mb-1.5">New previews</p>
@@ -610,7 +646,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                     )}
                   </Field>
 
-                  {/* Error */}
                   {error && (
                     <p className="text-sm text-red-400 bg-red-400/10 border border-red-400/30 rounded-xl px-3 py-2">
                       {error}
@@ -618,7 +653,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                   )}
                 </div>
 
-                {/* Footer */}
                 <div className="shrink-0 px-6 py-4 border-t border-gray-800 flex items-center justify-end gap-3 bg-gray-900/40">
                   <button
                     type="button"

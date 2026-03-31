@@ -1,4 +1,5 @@
 import React from 'react';
+import DOMPurify from 'dompurify';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, FreeMode, Pagination, Thumbs } from 'swiper/modules';
@@ -13,6 +14,10 @@ const PreviewGallery = ({ previews = [], title, description, showTitleAndDescrip
     const [thumbsSwiper, setThumbsSwiper] = React.useState(null);
 
     if (!previews || previews.length === 0) return null;
+
+    const safeDescription = description
+        ? DOMPurify.sanitize(description, { USE_PROFILES: { html: true } })
+        : '';
 
     return (
         <>
@@ -122,10 +127,11 @@ const PreviewGallery = ({ previews = [], title, description, showTitleAndDescrip
                         </>
                     )}
 
-                    {description && (
-                        <div className="text-pure-white/90 text-sm md:text-base leading-relaxed">
-                            {description}
-                        </div>
+                    {safeDescription && (
+                        <div
+                            className="tiptap-render text-pure-white/90 text-sm md:text-base leading-relaxed"
+                            dangerouslySetInnerHTML={{ __html: safeDescription }}
+                        />
                     )}
                 </div>
             )}
