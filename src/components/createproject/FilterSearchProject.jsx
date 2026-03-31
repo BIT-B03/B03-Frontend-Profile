@@ -5,9 +5,9 @@ import CompleteSvg from '../../assets/complete.svg'
 import SearchSvg from '../../assets/search.svg'
 
 const STATUS_OPTIONS = [
-  { key: 'all',      label: 'All Status',  icon: AllProjectSvg },
-  { key: 'progress', label: 'On Progress', icon: OnProgressSvg },
-  { key: 'complete', label: 'Complete',    icon: CompleteSvg   },
+  { key: 'all',      label: 'All Project', icon: AllProjectSvg },
+  { key: 'progress', label: 'Onprogress',  icon: OnProgressSvg },
+  { key: 'complete', label: 'Complate',    icon: CompleteSvg   },
 ]
 
 // Style per status untuk button aktif
@@ -83,15 +83,8 @@ export default function FilterSearchProject({
                   : 'bg-gray-800/50 text-gray-300 border-gray-700 hover:border-filter-all-border hover:bg-[rgba(183,183,183,0.2)]'
               }`}
             >
-              <img src={AllProjectSvg} alt="" className="w-3 h-3 md:w-4 md:h-4" />
-              My Project
-
-              {/* Badge status aktif */}
-              {ownerFilter === 'my' && statusFilter !== 'all' && (
-                <span className={`ml-1 text-[9px] px-1.5 py-0.5 rounded font-semibold ${STATUS_BADGE_STYLE[statusFilter] || 'bg-white/20'}`}>
-                  {activeStatus.label}
-                </span>
-              )}
+              <img src={activeStatus.icon} alt="" className="w-3 h-3 md:w-4 md:h-4" />
+              {activeStatus.label}
 
               {/* Chevron */}
               <svg

@@ -24,6 +24,7 @@ import PositionRole from './pages/PositionRole.jsx';
 import Profile from './pages/Profile.jsx';
 import CreateProject from './pages/CreateProject.jsx';
 import DetailProjectCreate from './pages/DetailProjectCreate.jsx';
+import EditProjectDescription from './pages/EditProjectDescription.jsx';
 import Settings from './pages/Settings.jsx';
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path="settings" element={<ProtectedRoute> <Settings /> </ProtectedRoute>} />
                     <Route path="create-project" element={<ProtectedRoute> <CreateProject /> </ProtectedRoute>} />
                     <Route path="create-project/:projectHashedId" element={<ProtectedRoute> <DetailProjectCreate /> </ProtectedRoute>} />
+                    <Route path="create-project/:projectHashedId/edit-description" element={<ProtectedRoute> <EditProjectDescription /> </ProtectedRoute>} />
 
                     <Route path="people" element={<Member />} />
                     <Route path="people/:userHashedId" element={<DetailMember />} />

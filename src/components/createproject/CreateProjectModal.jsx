@@ -13,7 +13,6 @@ const buildObjectUrl = (file) => file ? URL.createObjectURL(file) : null
 export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
   /* ── form fields ──────────────────────────────────────────────────────── */
   const [title,            setTitle]            = useState('')
-  const [description,      setDescription]      = useState('')
   const [shortDescription, setShortDescription] = useState('')
   const [status,           setStatus]           = useState('on_progress')
   const [thumbnail,        setThumbnail]        = useState(null)       // File
@@ -74,7 +73,6 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
   /* ── reset form ───────────────────────────────────────────────────────── */
   const resetForm = useCallback(() => {
     setTitle('')
-    setDescription('')
     setShortDescription('')
     setStatus('on_progress')
     setThumbnail(null)
@@ -164,7 +162,7 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
     try {
       const fd = new FormData()
       fd.append('title',             title.trim())
-      fd.append('description',       description.trim())
+      fd.append('description',       '')
       fd.append('short_description', shortDescription.trim())
       fd.append('status',            status)
       fd.append('created_by',    creatorHashedId)
@@ -174,9 +172,17 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
       // Backend menggunakan request.files.getlist('preview') — key harus 'preview'
       previews.forEach((f) => fd.append('preview', f))
 
-      await createProject(fd)
+      const created = await createProject(fd)
+      const createdPayload = created?.data ?? created
+      const createdId =
+        createdPayload?.hashed_id ||
+        createdPayload?.id_hash ||
+        createdPayload?.idHash ||
+        createdPayload?.project?.hashed_id ||
+        createdPayload?.project?.id_hash ||
+        null
       resetForm()
-      onSuccess?.()
+      onSuccess?.(createdId, created)
       onClose()
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || 'Failed to create project')
@@ -230,17 +236,9 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
                   />
                 </Field>
 
-                {/* Description */}
-                <Field label="Description Project">
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Enter project description"
-                    rows={3}
-                    className={`${inputCls} resize-none`}
-                    disabled={isSubmitting}
-                  />
-                </Field>
+                <div className="rounded-xl border border-dashed border-gray-700 bg-gray-900/40 px-3 py-2.5 text-xs text-gray-400">
+                  Deskripsi rich text ditambahkan setelah project berhasil dibuat.
+                </div>
 
                 {/* Short Description */}
                 <Field label="Short Description">

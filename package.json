@@ -11,8 +11,13 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
+    "@tiptap/extension-text-align": "^3.21.0",
+    "@tiptap/pm": "^3.21.0",
+    "@tiptap/react": "^3.21.0",
+    "@tiptap/starter-kit": "^3.21.0",
     "autoprefixer": "^10.4.23",
     "axios": "^1.13.4",
+    "dompurify": "^3.3.3",
     "framer-motion": "^12.31.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

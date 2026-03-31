@@ -1,4 +1,4 @@
-const PROGRESS_KEYWORDS = ['on_progress', 'in_progress', 'progress', 'ongoing', 'running']
+const PROGRESS_KEYWORDS = ['on_progress', 'progress', 'ongoing', 'running']
 const COMPLETE_KEYWORDS = ['complete', 'completed', 'done', 'finish']
 
 const createMeta = ({ label, tone, badgeClass }) => ({
@@ -36,7 +36,7 @@ export const getProjectStatusMeta = (status) => {
   const normalized = typeof raw === 'string' ? raw.trim().toLowerCase() : ''
 
   if (normalized && PROGRESS_KEYWORDS.some((keyword) => normalized.includes(keyword))) {
-    return createMeta({ label: 'In Progress', tone: 'progress', badgeClass: 'bg-red-500 text-pure-white' })
+    return createMeta({ label: 'On Progress', tone: 'progress', badgeClass: 'bg-red-500 text-pure-white' })
   }
 
   if (normalized && COMPLETE_KEYWORDS.some((keyword) => normalized.includes(keyword))) {
