@@ -10,12 +10,6 @@ export function usePositionRoleUpdate({ onSuccess } = {}) {
         async ({ member, formState }) => {
             if (!member?.hashed_id) return;
 
-            const currentRole = typeof window !== 'undefined' ? localStorage.getItem('role') : null;
-            if (currentRole === 'admin' && formState.role === 'superuser') {
-                setError('Admin tidak diperbolehkan mengubah role menjadi superuser.');
-                return;
-            }
-
             const payload = {};
 
             if (formState.role && formState.role !== member.role && formState.role !== member.division) {

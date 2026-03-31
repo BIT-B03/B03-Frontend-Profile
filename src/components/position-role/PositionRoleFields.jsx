@@ -118,7 +118,6 @@ export default function PositionRoleFields({
     const defaultRoleOptions = [
         'user',
         'admin',
-        'superuser',
     ];
     const defaultPositionOptions = [
         'Members',
@@ -129,11 +128,7 @@ export default function PositionRoleFields({
 
     const baseRoleOpts = roleOptions && roleOptions.length ? roleOptions : defaultRoleOptions;
 
-    const currentRole = typeof window !== 'undefined' ? localStorage.getItem('role') : null;
-    const roleOpts =
-        currentRole === 'admin'
-            ? baseRoleOpts.filter((opt) => opt !== 'superuser')
-            : baseRoleOpts;
+    const roleOpts = baseRoleOpts;
     const positionOpts = positionOptions && positionOptions.length ? positionOptions : defaultPositionOptions;
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
