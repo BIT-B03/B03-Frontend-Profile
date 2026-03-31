@@ -6,12 +6,10 @@ import {
   getProjectPreviewImageUrl,
 } from '../../api/api'
 import useEditProjectModal from '../../hooks/useEditProjectModal'
-import ImageCropModal from '../common/ImageCropModal'
-import useImageCropQueue from '../../hooks/useImageCropQueue'
 
 const STATUS_OPTIONS = [
   { value: 'on_progress', label: 'On Progress' },
-  { value: 'completed', label: 'Complete' },
+  { value: 'completed',   label: 'Complete'    },
 ]
 
 export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess }) {
@@ -54,294 +52,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
     handleSubmit,
     selectedLabels,
   } = useEditProjectModal({ isOpen, projectId, onClose, onSuccess })
-const buildObjectUrl = (file) => (file ? URL.createObjectURL(file) : null)
-
-const normalizeStatusValue = (raw = '') => {
-  const s = raw.toLowerCase()
-  if (s === 'on_progress' || s === 'progress' || s === 'on progress') return 'on_progress'
-  if (s === 'completed' || s === 'complete') return 'completed'
-  return 'on_progress'
-}
-
-export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess }) {
-  /* ── form fields ──────────────────────────────────────────────────────── */
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [shortDescription, setShortDescription] = useState('')
-  const [status, setStatus] = useState('on_progress')
-
-  /* ── thumbnail ────────────────────────────────────────────────────────── */
-  const [thumbFile, setThumbFile] = useState(null)    // new File
-  const [thumbObjUrl, setThumbObjUrl] = useState(null)    // Object URL for new file
-  const [existingThumb, setExistingThumb] = useState(null)    // filename from server
-
-  /* ── previews ─────────────────────────────────────────────────────────── */
-  const [existingPreviews, setExistingPreviews] = useState([])   // filenames from server
-  // Single array of { file: File, url: string } — keeps files & URLs always in sync
-  const [newPreviews, setNewPreviews] = useState([])   // { file, url }[]
-  const [previewsModified, setPreviewsModified] = useState(false)
-
-  /* ── contributors ─────────────────────────────────────────────────────── */
-  const [users, setUsers] = useState([])
-  const [selectedContribs, setSelectedContribs] = useState([])    // hashed_id[]
-  const [contribDropOpen, setContribDropOpen] = useState(false)
-  const [contribSearch, setContribSearch] = useState('')
-  const contribRef = useRef(null)
-
-  /* ── misc ─────────────────────────────────────────────────────────────── */
-  const [loadingData, setLoadingData] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState(null)
-
-  const thumbInputRef = useRef(null)
-  const previewInputRef = useRef(null)
-
-  /* ── fetch project + users when modal opens ───────────────────────────── */
-  // NOTE: EditProjectModal uses key={projectId} in the parent so a fresh component
-  // instance is created each time a different project is opened. This means the
-  // effect only ever runs once per mount — no ref guard needed.
-  useEffect(() => {
-    if (!isOpen || !projectId) return
-
-    setLoadingData(true)
-    setError(null)
-
-    Promise.all([getProjectDetail(projectId), getAllUsers()])
-      .then(([projectRes, usersRes]) => {
-        const p = projectRes?.data || projectRes
-        const usersList = Array.isArray(usersRes?.data)
-          ? usersRes.data
-          : Array.isArray(usersRes) ? usersRes : []
-
-        setUsers(usersList)
-        setTitle(p.title || '')
-        setDescription(p.description || '')
-        setShortDescription(p.short_description || '')
-        setStatus(normalizeStatusValue(p.status || ''))
-        setExistingThumb(p.thumbnail || p.thumbnail_url || null)
-
-        // Existing preview filenames
-        // Authenticated API returns key 'preview' (array of objects with .filename)
-        const previews = Array.isArray(p.preview) ? p.preview
-          : Array.isArray(p.previews) ? p.previews
-            : []
-        setExistingPreviews(
-          previews
-            .map((pr) => {
-              if (typeof pr === 'string') return pr
-              // { filename: '...' } shape (ProjectPreview model)
-              return pr.filename || pr.preview_url || pr.preview || pr.url || ''
-            })
-            .filter(Boolean)
-        )
-
-        // Contributors → user hashed_ids
-        // Authenticated endpoint uses joinedload(Contributor.user), so the user fields
-        // are nested under c.user. Public API flattens them onto c directly.
-        // Priority: c.user.hashed_id  →  c.user.id_hash  →  c.hashed_id  →  c.id_hash
-        const contribs = Array.isArray(p.contributors) ? p.contributors : []
-        setSelectedContribs(
-          contribs
-            .map((c) =>
-              c.user?.hashed_id ||
-              c.user?.id_hash ||
-              c.hashed_id ||
-              c.id_hash ||
-              null
-            )
-            .filter(Boolean)
-        )
-      })
-      .catch(() => setError('Gagal memuat data proyek'))
-      .finally(() => setLoadingData(false))
-  }, [isOpen, projectId])
-
-  /* ── close contrib dropdown on outside click ──────────────────────────── */
-  useEffect(() => {
-    const handler = (e) => {
-      if (contribRef.current && !contribRef.current.contains(e.target)) {
-        setContribDropOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  /* ── lock body scroll ─────────────────────────────────────────────────── */
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [isOpen])
-
-  /* ── cleanup object URLs on unmount ───────────────────────────────────── */
-  useEffect(() => {
-    return () => {
-      if (thumbObjUrl) URL.revokeObjectURL(thumbObjUrl)
-      newPreviews.forEach((p) => URL.revokeObjectURL(p.url))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  /* ── reset ────────────────────────────────────────────────────────────── */
-  const resetForm = useCallback(() => {
-    setTitle('')
-    setDescription('')
-    setShortDescription('')
-    setStatus('on_progress')
-    setThumbFile(null)
-    if (thumbObjUrl) URL.revokeObjectURL(thumbObjUrl)
-    setThumbObjUrl(null)
-    setExistingThumb(null)
-    setNewPreviews((prev) => { prev.forEach((p) => URL.revokeObjectURL(p.url)); return [] })
-    setExistingPreviews([])
-    setPreviewsModified(false)
-    setSelectedContribs([])
-    setContribSearch('')
-    setError(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const handleCropResult = useCallback((croppedFile, target) => {
-    if (target === 'thumbnail') {
-      if (thumbObjUrl) URL.revokeObjectURL(thumbObjUrl)
-      setThumbFile(croppedFile)
-      setThumbObjUrl(buildObjectUrl(croppedFile))
-      setExistingThumb(null)
-      return
-    }
-
-    if (target === 'preview') {
-      const url = buildObjectUrl(croppedFile)
-      setNewPreviews((prev) => [...prev, { file: croppedFile, url }])
-      setPreviewsModified(true)
-    }
-  }, [thumbObjUrl])
-
-  const {
-    modalProps: cropModalProps,
-    openCrop,
-    openCropQueue,
-    closeCrop,
-  } = useImageCropQueue({
-    aspect: 16 / 9,
-    cropShape: 'rect',
-    showGrid: true,
-    title: 'Crop Image',
-    subtitle: 'Adjust the frame for a 16:9 crop.',
-    saveLabel: 'Use Image',
-    onCropped: handleCropResult,
-  })
-
-  const handleClose = () => {
-    if (isSubmitting) return
-    closeCrop()
-    resetForm()
-    onClose()
-  }
-
-  /* ── thumbnail ────────────────────────────────────────────────────────── */
-  const handleThumbnailChange = (file) => {
-    if (!file) return
-    openCrop(file, 'thumbnail')
-  }
-
-  const onThumbDrop = (e) => {
-    e.preventDefault()
-    const file = e.dataTransfer.files?.[0]
-    if (file) handleThumbnailChange(file)
-  }
-
-  /* ── preview images ───────────────────────────────────────────────────── */
-  const addPreviewFiles = (files) => {
-    openCropQueue(files, 'preview')
-  }
-
-  const removeNewPreview = (idx) => {
-    setNewPreviews((prev) => {
-      URL.revokeObjectURL(prev[idx].url)
-      return prev.filter((_, i) => i !== idx)
-    })
-    setPreviewsModified(true)
-  }
-
-  const removeExistingPreview = (idx) => {
-    setExistingPreviews((prev) => prev.filter((_, i) => i !== idx))
-    setPreviewsModified(true)
-  }
-
-
-  const onPreviewDrop = (e) => {
-    e.preventDefault()
-    addPreviewFiles(e.dataTransfer.files)
-  }
-
-  /* ── contributors ─────────────────────────────────────────────────────── */
-  const toggleContrib = (hashedId) => {
-    setSelectedContribs((prev) =>
-      prev.includes(hashedId) ? prev.filter((id) => id !== hashedId) : [...prev, hashedId]
-    )
-  }
-
-  const myHashedId = localStorage.getItem('hashed_id') || ''
-
-  const filteredUsers = users.filter((u) => {
-    if (u.hashed_id === myHashedId) return false
-    const q = contribSearch.toLowerCase()
-    return (
-      !q ||
-      (u.name || '').toLowerCase().includes(q) ||
-      (u.username || '').toLowerCase().includes(q) ||
-      (u.position || '').toLowerCase().includes(q)
-    )
-  })
-
-  /* ── submit ───────────────────────────────────────────────────────────── */
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!title.trim()) { setError('Judul proyek wajib diisi'); return }
-    if (selectedContribs.length === 0) { setError('Minimal 1 kontributor harus dipilih'); return }
-
-    setIsSubmitting(true)
-    setError(null)
-
-    try {
-      const fd = new FormData()
-      fd.append('title', title.trim())
-      fd.append('description', description)
-      fd.append('short_description', shortDescription)
-      fd.append('status', status)
-
-      if (thumbFile) fd.append('thumbnail', thumbFile)
-
-      // Only send preview fields if user modified the previews section.
-      // existing_previews → JSON array of filenames to KEEP (strings, no files)
-      // preview           → new file uploads only
-      // Separating the two keys removes all ambiguity in parse_request_data.
-      if (previewsModified) {
-        // Tell backend which existing filenames to retain (as a JSON array)
-        fd.append('existing_previews', JSON.stringify(existingPreviews))
-        // Send only newly added files under 'preview'
-        newPreviews.forEach(({ file }) => fd.append('preview', file))
-      }
-
-      // Send as JSON string — same as CreateProjectModal — so _normalize_contributors() can parse it
-      fd.append('contributors', JSON.stringify(selectedContribs))
-
-      await editProject(projectId, fd)
-      resetForm()
-      onClose()
-      onSuccess?.()
-    } catch (err) {
-      const msg = err?.response?.data?.message
-      setError(typeof msg === 'string' ? msg : 'Gagal menyimpan perubahan')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const selectedLabels = users
-    .filter((u) => selectedContribs.includes(u.hashed_id))
-    .map((u) => u.name || u.username)
 
   const currentThumbSrc = thumbObjUrl || (existingThumb ? getProjectThumbnailImageUrl(existingThumb) : null)
   return (
@@ -474,8 +184,9 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                                   <button
                                     type="button"
                                     onClick={() => toggleContrib(u.hashed_id)}
-                                    className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm transition-colors ${selected ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'
-                                      }`}
+                                    className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm transition-colors ${
+                                      selected ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                                    }`}
                                   >
                                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                       {(u.name || u.username || '?')[0].toUpperCase()}
@@ -683,7 +394,6 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
           </motion.div>
         </div>
       )}
-      <ImageCropModal {...cropModalProps} />
     </AnimatePresence>
   )
 }
