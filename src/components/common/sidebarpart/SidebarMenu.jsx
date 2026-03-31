@@ -1,8 +1,43 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import SidebarIcons from '../sidebarIcons';
 
 export default function SidebarMenu({ isCollapsed, activePath, menuItems, onGo }) {
+  const storageKey = 'sidebar-submenu-state';
+  const [manualSubmenuState, setManualSubmenuState] = useState(() => {
+    try {
+      const savedState = sessionStorage.getItem(storageKey);
+      return savedState ? JSON.parse(savedState) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem(storageKey, JSON.stringify(manualSubmenuState));
+  }, [manualSubmenuState]);
+
+  // Determine which submenu should be open based on active path
+  const autoOpenSubmenu = useMemo(() => {
+    for (const item of menuItems) {
+      if (item.children && item.children.length > 0) {
+        const hasActiveChild = item.children.some((child) => activePath.startsWith(child.path));
+        if (hasActiveChild) {
+          return item.label;
+        }
+      }
+    }
+    return null;
+  }, [activePath, menuItems]);
+
+  // Use auto-open submenu unless the user manually toggled it
+  const isSubmenuOpen = (label) => {
+    if (Object.prototype.hasOwnProperty.call(manualSubmenuState, label)) {
+      return manualSubmenuState[label];
+    }
+    return autoOpenSubmenu === label;
+  };
+
   const menuItemStyles = {
     button: ({ active, level }) => {
       const collapsedRoot = isCollapsed && level === 0;
@@ -57,13 +92,30 @@ export default function SidebarMenu({ isCollapsed, activePath, menuItems, onGo }
               icon={SidebarIcons[item.iconKey] || null}
               label={item.label}
               title={isCollapsed ? item.label : undefined}
+              open={isSubmenuOpen(item.label)}
+              onOpenChange={(open) => {
+                const nextState = {
+                  ...manualSubmenuState,
+                  [item.label]: open,
+                };
+                sessionStorage.setItem(storageKey, JSON.stringify(nextState));
+                setManualSubmenuState(nextState);
+              }}
             >
               {item.children.map((child) => (
                 <MenuItem
                   key={child.path}
                   icon={child.iconKey ? SidebarIcons[child.iconKey] : null}
                   active={activePath === child.path}
-                  onClick={() => onGo(child.path)}
+                  onClick={() => {
+                    const nextState = {
+                      ...manualSubmenuState,
+                      [item.label]: true,
+                    };
+                    sessionStorage.setItem(storageKey, JSON.stringify(nextState));
+                    setManualSubmenuState(nextState);
+                    onGo(child.path);
+                  }}
                 >
                   {child.label}
                 </MenuItem>

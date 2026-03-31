@@ -108,6 +108,7 @@ export default function PositionRoleFields({
     photoDisabled,
     photoIsUploading,
     photoError,
+    photoSuccessMessage,
     onPickPhoto,
     onDeletePhoto,
     roleOptions = [],
@@ -144,6 +145,7 @@ export default function PositionRoleFields({
                     disabled={photoDisabled ?? disabled}
                     isUploading={photoIsUploading}
                     error={photoError}
+                    successMessage={photoSuccessMessage}
                     onPickFile={onPickPhoto}
                     onDeleteFile={onDeletePhoto}
                 />

@@ -16,6 +16,7 @@ import DetailProject from './pages/DetailProject.jsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import ErrorHandlerPage from './pages/ErrorHandlerPage.jsx';
 import NotFoundRedirect from './pages/NotFoundRedirect.jsx';
+import AboutPage from './pages/AboutPage.jsx';
 import ProtectedRoute from './utils/ProtectRoute';
 import KickRequests from './pages/KickRequests.jsx';
 import CreateKickRequest from './pages/CreateKickRequest.jsx';
@@ -26,6 +27,7 @@ import CreateProject from './pages/CreateProject.jsx';
 import DetailProjectCreate from './pages/DetailProjectCreate.jsx';
 import EditProjectDescription from './pages/EditProjectDescription.jsx';
 import Settings from './pages/Settings.jsx';
+import Contact from './pages/Contact.jsx';
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -51,6 +53,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path="login" element={<LoginPage />} />
                     <Route path="project" element={<OurProject />} />
                     <Route path="projects/:projectHashedId" element={<DetailProject />} />
+                    <Route path="contact" element={<Contact />} />
+                    <Route path="about" element={<AboutPage />} />
                     <Route path="reset-password" element={<ResetPasswordPage />} />
                     <Route path="forgot-password" element={<Navigate to="/reset-password" replace />} />
                     <Route path="error" element={<ErrorHandlerPage />} />
