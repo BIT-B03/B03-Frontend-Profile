@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   getProjectThumbnailImageUrl,
   getProjectPreviewImageUrl,
+  getAvatarImageUrl,
 } from '../../api/api'
 import useEditProjectModal from '../../hooks/useEditProjectModal'
 
@@ -88,7 +89,7 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-                <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4">
+                <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4 sidebar-scrollbar">
                   <Field label="Title Project" required>
                     <input
                       value={title}
@@ -173,12 +174,14 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                               className="w-full bg-gray-800 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none placeholder-gray-500"
                             />
                           </div>
-                          <ul className="max-h-44 overflow-y-auto">
+                          <ul className="max-h-44 overflow-y-auto sidebar-scrollbar">
                             {filteredUsers.length === 0 && (
                               <li className="px-3 py-2.5 text-gray-500 text-sm">No users found</li>
                             )}
                             {filteredUsers.map((u) => {
                               const selected = selectedContribs.includes(u.hashed_id)
+                              const avatarUrl = u.avatar_url ? getAvatarImageUrl(u.avatar_url) : null
+                              const initials = (u.name || u.username || '?')[0].toUpperCase()
                               return (
                                 <li key={u.hashed_id}>
                                   <button
@@ -188,13 +191,22 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
                                       selected ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'
                                     }`}
                                   >
-                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                      {(u.name || u.username || '?')[0].toUpperCase()}
+                                    {/* Avatar */}
+                                    <div className="shrink-0 w-7 h-7 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 text-white text-xs font-bold">
+                                      {avatarUrl ? (
+                                        <img src={avatarUrl} alt={u.name || u.username} className="w-full h-full object-cover" />
+                                      ) : (
+                                        initials
+                                      )}
                                     </div>
+                                    
+                                    {/* Info */}
                                     <div className="flex-1 text-left min-w-0">
                                       <p className="font-medium truncate">{u.name || u.username}</p>
                                       {u.position && <p className="text-xs text-gray-500 truncate">{u.position}</p>}
                                     </div>
+                                    
+                                    {/* Checkmark */}
                                     {selected && (
                                       <svg className="w-4 h-4 text-brand-24e1c9 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />

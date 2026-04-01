@@ -9,7 +9,7 @@ export default function HomePage() {
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Contact', href: '/contact' },
     { label: 'People', href: '/people' },
     { label: 'Project', href: '/project' }
   ]
