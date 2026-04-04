@@ -6,12 +6,13 @@ import ContactInfoGrid from '../components/contact/ContactInfoGrid';
 import ContactMapCard from '../components/contact/ContactMapCard';
 
 export default function Contact() {
-    const navItems = [
-        { label: 'Home', href: '/' },
-        { label: 'Project', href: '/project' },
-        { label: 'People', href: '/people' },
-        { label: 'Contact', href: '/contact' },
-    ];
+const navItems = [
+    { label: 'Home', href: '/' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
+    { label: 'People', href: '/people' },
+    { label: 'Project', href: '/project' }
+];
 
     return (
         <GuestMemberBackground>

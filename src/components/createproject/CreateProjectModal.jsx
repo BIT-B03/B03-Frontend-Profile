@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { createProject, getAllUsers } from '../../api/api'
+import { createProject, getAllUsers, getAvatarImageUrl } from '../../api/api'
 
 const STATUS_OPTIONS = [
   { value: 'on_progress', label: 'On Progress' },
@@ -150,7 +150,6 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!title.trim()) { setError('Title is required'); return }
-    if (selectedContribs.length === 0) { setError('Pilih minimal 1 kontributor.'); return }
     if (!thumbnail) { setError('Thumbnail wajib diisi.'); return }
     if (previews.length === 0) { setError('Minimal 1 gambar preview wajib diisi.'); return }
 
@@ -223,7 +222,7 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
 
             {/* ── Scrollable body ─────────────────────────────────────── */}
             <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-              <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4">
+              <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4 sidebar-scrollbar">
 
                 {/* Title */}
                 <Field label="Title Project" required>
@@ -296,28 +295,42 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
                           />
                         </div>
                         {/* List */}
-                        <ul className="max-h-44 overflow-y-auto">
+                        <ul className="max-h-44 overflow-y-auto sidebar-scrollbar">
                           {filteredUsers.length === 0 && (
                             <li className="px-3 py-2.5 text-gray-500 text-sm">No users found</li>
                           )}
                           {filteredUsers.map((u) => {
                             const checked = selectedContribs.includes(u.hashed_id)
+                            const avatarUrl = u.avatar_url ? getAvatarImageUrl(u.avatar_url) : null
+                            const initials = (u.name || u.username || '?')[0].toUpperCase()
                             return (
                               <li key={u.hashed_id}>
                                 <button
                                   type="button"
                                   onClick={() => toggleContrib(u.hashed_id)}
-                                  className={`flex items-center gap-2 w-full px-3 py-2.5 text-sm text-left transition-colors ${checked ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}
+                                  className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left transition-colors ${checked ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}
                                 >
-                                  {/* Checkbox */}
-                                  <span className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center ${checked ? 'bg-brand-24e1c9 border-brand-24e1c9' : 'border-gray-600'}`}>
-                                    {checked && (
-                                      <svg className="w-2.5 h-2.5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                      </svg>
+                                  {/* Avatar */}
+                                  <div className="shrink-0 w-7 h-7 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 text-white text-xs font-bold">
+                                    {avatarUrl ? (
+                                      <img src={avatarUrl} alt={u.name || u.username} className="w-full h-full object-cover" />
+                                    ) : (
+                                      initials
                                     )}
-                                  </span>
-                                  <span>{u.name || u.username}</span>
+                                  </div>
+                                  
+                                  {/* Info */}
+                                  <div className="flex-1 text-left min-w-0">
+                                    <p className="font-medium truncate">{u.name || u.username}</p>
+                                    {u.position && <p className="text-xs text-gray-500 truncate">{u.position}</p>}
+                                  </div>
+                                  
+                                  {/* Checkbox/Checkmark */}
+                                  {checked && (
+                                    <svg className="w-4 h-4 text-brand-24e1c9 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
                                 </button>
                               </li>
                             )
