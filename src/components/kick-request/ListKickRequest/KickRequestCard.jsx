@@ -1,24 +1,33 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import KickRequestStatusBadge from './KickRequestStatusBadge';
 import useKickRequestCardMeta from '../../../hooks/useKickRequestCardMeta';
-import KickRequestApprovalModal from './KickRequestApprovalModal';
-import { approveKickRequest } from '../../../api/api';
+import { KickRequestApprovalModal, KickRequestRejectModal } from './KickRequestModals';
+import KickRequestDetails from './KickRequestDetails';
+import { approveKickRequest, rejectKickRequest } from '../../../api/api';
 
 const chevronDownIcon = '/svg/icon-chevron-down.svg';
 
-function ApprovalChip({ label, active }) {
+function ApprovalChip({ label, status }) {
+    const isApproved = status === 'approved';
+    const isRejected = status === 'rejected';
     return (
         <span
-            className={`inline-flex items-center gap-2 rounded-[8px] border px-3 py-1 text-xs font-semibold tracking-wide ${active
+            className={`inline-flex items-center gap-2 rounded-[8px] border px-3 py-1 text-xs font-semibold tracking-wide ${isApproved
                 ? 'border-brand-24e1c9/40 bg-brand-24e1c9/10 text-brand-24e1c9'
-                : 'border-white/12 bg-white/5 text-muted-gray'
+                : isRejected
+                    ? 'border-filter-red-border/40 bg-[rgba(220,38,38,0.1)] text-pure-white'
+                    : 'border-white/12 bg-white/5 text-muted-gray'
                 }`}
         >
-            {active ? (
+            {isApproved ? (
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+            ) : isRejected ? (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
             ) : (
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,37 +53,31 @@ const CalendarIcon = (props) => (
     </svg>
 );
 
-const CheckIcon = (props) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M5 13l4 4L19 7" />
-    </svg>
-);
-
-const CloseIcon = (props) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-    </svg>
-);
-
 export default function KickRequestCard({ request, onApproved }) {
     const [expanded, setExpanded] = useState(false);
     const [approvalModalOpen, setApprovalModalOpen] = useState(false);
+    const [rejectModalOpen, setRejectModalOpen] = useState(false);
     const [duplicateError, setDuplicateError] = useState(null);
+    const [approvalError, setApprovalError] = useState('');
+    const [rejectError, setRejectError] = useState('');
     const {
         approvedBy,
+        rejectedBy,
         createdAt,
         avatarSrc,
         initials,
+        roleStatuses,
+        hasApproved,
     } = useKickRequestCardMeta(request);
     const [status, setStatus] = useState(request?.status || '');
     const [approvalSubmitting, setApprovalSubmitting] = useState(false);
+    const [rejectSubmitting, setRejectSubmitting] = useState(false);
 
     const toggleLabel = expanded ? 'Hide Details' : 'View Details';
 
     const handleApproveClick = () => {
-        const currentUser = typeof window !== 'undefined' ? (localStorage.getItem('username') || '').trim().toLowerCase() : '';
-        const approvers = Array.isArray(approvedBy) ? approvedBy.map((n) => (n || '').trim().toLowerCase()) : [];
-        if (currentUser && approvers.includes(currentUser)) {
+        setApprovalError('');
+        if (hasApproved) {
             setDuplicateError('You have already approved this member.');
             setTimeout(() => setDuplicateError(null), 5000);
             return;
@@ -85,6 +88,12 @@ export default function KickRequestCard({ request, onApproved }) {
 
     const handleCancelApproval = () => {
         setApprovalModalOpen(false);
+        setApprovalError('');
+    };
+
+    const handleCancelReject = () => {
+        setRejectModalOpen(false);
+        setRejectError('');
     };
 
     const handleConfirmApproval = async () => {
@@ -103,9 +112,37 @@ export default function KickRequestCard({ request, onApproved }) {
             }
         } catch (err) {
             console.error('Approve failed', err);
-            alert('Failed to approve request. Please try again.');
+            setApprovalError('Failed to approve request. Please try again.');
         } finally {
             setApprovalSubmitting(false);
+        }
+    };
+
+    const handleRejectClick = () => {
+        if (!request?.hashed_id) return;
+        setRejectError('');
+        setRejectModalOpen(true);
+    };
+
+    const handleConfirmReject = async () => {
+        if (!request?.hashed_id) return setRejectModalOpen(false);
+        setRejectSubmitting(true);
+        try {
+            await rejectKickRequest(request.hashed_id);
+            setStatus('rejected');
+            setRejectModalOpen(false);
+            if (typeof onApproved === 'function') {
+                try {
+                    onApproved();
+                } catch (e) {
+                    console.warn('onApproved callback failed', e);
+                }
+            }
+        } catch (err) {
+            console.error('Reject failed', err);
+            setRejectError('Failed to reject request. Please try again.');
+        } finally {
+            setRejectSubmitting(false);
         }
     };
 
@@ -150,61 +187,33 @@ export default function KickRequestCard({ request, onApproved }) {
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                            <ApprovalChip label="Coordinator" active={Boolean(request?.koordinator_approved)} />
-                            <ApprovalChip label="Mentor" active={Boolean(request?.mentor_approved)} />
+                            <ApprovalChip
+                                label="Coordinator"
+                                status={roleStatuses.coordinator}
+                            />
+                            <ApprovalChip
+                                label="Co-Coordinator"
+                                status={roleStatuses.coCoordinator}
+                            />
+                            <ApprovalChip
+                                label="Mentor"
+                                status={roleStatuses.mentor}
+                            />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <AnimatePresence initial={false}>
-                {expanded && (
-                    <motion.div
-                        key="details"
-                        initial={{ opacity: 0, scaleY: 0.8 }}
-                        animate={{ opacity: 1, scaleY: 1 }}
-                        exit={{ opacity: 0, scaleY: 0.8 }}
-                        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                        style={{ transformOrigin: 'top' }}
-                        className="border-t border-white/10 bg-[#0f141d] shadow-[0_35px_120px_rgba(0,0,0,0.45)] px-6 py-6 space-y-6"
-                    >
-                        <div className="space-y-2">
-                            <p className="text-sm font-semibold text-pure-white">Reason for Removal</p>
-                            <p className="text-sm text-muted-gray leading-relaxed">
-                                {request?.reason || 'No reason provided'}
-                            </p>
-                        </div>
-
-                        <div className="space-y-2">
-                            <p className="text-sm font-semibold text-pure-white">Approved By</p>
-                            {approvedBy.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {approvedBy.map((name) => (
-                                        <span
-                                            key={name}
-                                            className="rounded-full border border-brand-24e1c9/40 bg-brand-24e1c9/10 text-brand-24e1c9 px-3 py-1 text-xs font-medium"
-                                        >
-                                            {name}
-                                        </span>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-emerald-100">No approvals recorded yet.</p>
-                            )}
-                        </div>
-
-                        <div className="flex gap-3">
-                            <button
-                                type="button"
-                                onClick={handleApproveClick}
-                                className="flex-1 inline-flex items-center justify-center gap-2 rounded-[10px] bg-brand-24e1c9 py-1.5 text-sm font-semibold text-dark-bg shadow-[0_10px_30px_rgba(36,225,201,0.2)] hover:opacity-90 transition"
-                            >
-                                Approve Request
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <KickRequestDetails
+                expanded={expanded}
+                reason={request?.reason}
+                approvedBy={approvedBy}
+                rejectedBy={rejectedBy}
+                onApprove={handleApproveClick}
+                onReject={handleRejectClick}
+                approveDisabled={approvalSubmitting}
+                rejectDisabled={rejectSubmitting}
+            />
 
             <div className="border-t border-white/5 px-6 py-3">
                 <button
@@ -226,6 +235,15 @@ export default function KickRequestCard({ request, onApproved }) {
                 onCancel={handleCancelApproval}
                 onConfirm={handleConfirmApproval}
                 loading={approvalSubmitting}
+                error={approvalError}
+            />
+            <KickRequestRejectModal
+                open={rejectModalOpen}
+                memberName={request?.user_name}
+                onCancel={handleCancelReject}
+                onConfirm={handleConfirmReject}
+                loading={rejectSubmitting}
+                error={rejectError}
             />
         </motion.div>
     );

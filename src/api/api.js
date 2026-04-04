@@ -345,6 +345,16 @@ export const approveKickRequest = async (kickHashId) => {
     return response.data;
 };
 
+export const rejectKickRequest = async (kickHashId) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;
+    const response = await API.put(
+        `/admin/kick-requests/reject/${kickHashId}`,
+        {},
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+};
+
 
 export const uploadMemberDisplay = async (userHashedId, file) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_access_token') : null;

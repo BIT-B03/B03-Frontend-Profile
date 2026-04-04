@@ -15,6 +15,12 @@ const parseApprovedBy = (value) => {
     return [];
 };
 
+const getRoleStatus = (approved, rejected) => {
+    if (approved) return 'approved';
+    if (rejected) return 'rejected';
+    return 'neutral';
+};
+
 const formatDate = (dateString) => {
     if (!dateString) return 'Unknown date';
     const date = new Date(dateString);
@@ -37,6 +43,20 @@ const summarizeReason = (reason) => {
 
 export default function useKickRequestCardMeta(request) {
     const approvedBy = useMemo(() => parseApprovedBy(request?.approved_by), [request?.approved_by]);
+    const rejectedBy = useMemo(() => parseApprovedBy(request?.rejected_by), [request?.rejected_by]);
+
+    const normalizedCurrentUser = useMemo(() => {
+        if (typeof window === 'undefined') return '';
+        return String(localStorage.getItem('username') || '').trim().toLowerCase();
+    }, []);
+    const approversLower = useMemo(
+        () => approvedBy.map((name) => String(name || '').trim().toLowerCase()),
+        [approvedBy]
+    );
+    const hasApproved = useMemo(
+        () => Boolean(normalizedCurrentUser && approversLower.includes(normalizedCurrentUser)),
+        [approversLower, normalizedCurrentUser]
+    );
 
     const createdAt = useMemo(() => formatDate(request?.created_at), [request?.created_at]);
 
@@ -50,6 +70,22 @@ export default function useKickRequestCardMeta(request) {
 
     const reasonSummary = useMemo(() => summarizeReason(request?.reason), [request?.reason]);
 
+    const roleStatuses = useMemo(
+        () => ({
+            coordinator: getRoleStatus(request?.koordinator_approved, request?.koordinator_rejected),
+            coCoordinator: getRoleStatus(request?.co_coordinator_approved, request?.co_coordinator_rejected),
+            mentor: getRoleStatus(request?.mentor_approved, request?.mentor_rejected),
+        }),
+        [
+            request?.koordinator_approved,
+            request?.koordinator_rejected,
+            request?.co_coordinator_approved,
+            request?.co_coordinator_rejected,
+            request?.mentor_approved,
+            request?.mentor_rejected,
+        ]
+    );
+
     const othersCount = useMemo(() => {
         const base = approvedBy.length;
         const known = 2;
@@ -58,10 +94,13 @@ export default function useKickRequestCardMeta(request) {
 
     return {
         approvedBy,
+        rejectedBy,
         createdAt,
         avatarSrc,
         initials,
         reasonSummary,
         othersCount,
+        roleStatuses,
+        hasApproved,
     };
 }
