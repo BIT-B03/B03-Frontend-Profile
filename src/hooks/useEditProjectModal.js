@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     getAllUsers,
     getProjectDetail,
     editProject,
 } from '../api/api';
-
-const buildObjectUrl = (file) => (file ? URL.createObjectURL(file) : null);
+import { buildObjectUrl } from '../utils/createprojectmodal';
 
 const normalizeStatusValue = (raw = '') => {
     const s = raw.toLowerCase();
@@ -30,16 +29,10 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
 
     const [users, setUsers] = useState([]);
     const [selectedContribs, setSelectedContribs] = useState([]);
-    const [contribDropOpen, setContribDropOpen] = useState(false);
-    const [contribSearch, setContribSearch] = useState('');
-    const contribRef = useRef(null);
 
     const [loadingData, setLoadingData] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
-
-    const thumbInputRef = useRef(null);
-    const previewInputRef = useRef(null);
 
     const latestThumbUrlRef = useRef(null);
     const latestPreviewsRef = useRef([]);
@@ -102,16 +95,6 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
     }, [isOpen, projectId]);
 
     useEffect(() => {
-        const handler = (e) => {
-            if (contribRef.current && !contribRef.current.contains(e.target)) {
-                setContribDropOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, []);
-
-    useEffect(() => {
         document.body.style.overflow = isOpen ? 'hidden' : '';
         return () => { document.body.style.overflow = ''; };
     }, [isOpen]);
@@ -140,7 +123,6 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
         setExistingPreviews([]);
         setPreviewsModified(false);
         setSelectedContribs([]);
-        setContribSearch('');
         setError(null);
     }, [thumbObjUrl]);
 
@@ -157,12 +139,6 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
         setThumbObjUrl(buildObjectUrl(file));
         setExistingThumb(null);
     }, [thumbObjUrl]);
-
-    const onThumbDrop = useCallback((e) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files?.[0];
-        if (file) handleThumbnailChange(file);
-    }, [handleThumbnailChange]);
 
     const addPreviewFiles = useCallback((files) => {
         const arr = Array.from(files || []);
@@ -185,30 +161,6 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
         setExistingPreviews((prev) => prev.filter((_, i) => i !== idx));
         setPreviewsModified(true);
     }, []);
-
-    const onPreviewDrop = useCallback((e) => {
-        e.preventDefault();
-        addPreviewFiles(e.dataTransfer.files);
-    }, [addPreviewFiles]);
-
-    const toggleContrib = useCallback((hashedId) => {
-        setSelectedContribs((prev) =>
-            prev.includes(hashedId) ? prev.filter((id) => id !== hashedId) : [...prev, hashedId]
-        );
-    }, []);
-
-    const myHashedId = useMemo(() => localStorage.getItem('hashed_id') || '', []);
-
-    const filteredUsers = useMemo(() => users.filter((u) => {
-        if (u.hashed_id === myHashedId) return false;
-        const q = contribSearch.toLowerCase();
-        return (
-            !q ||
-            (u.name || '').toLowerCase().includes(q) ||
-            (u.username || '').toLowerCase().includes(q) ||
-            (u.position || '').toLowerCase().includes(q)
-        );
-    }), [users, myHashedId, contribSearch]);
 
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
@@ -260,55 +212,30 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
         title,
     ]);
 
-    const selectedLabels = useMemo(() => users
-        .filter((u) => selectedContribs.includes(u.hashed_id))
-        .map((u) => u.name || u.username)
-    , [users, selectedContribs]);
-
     return {
         title,
         setTitle,
-        description,
-        setDescription,
         shortDescription,
         setShortDescription,
         status,
         setStatus,
         thumbFile,
-        setThumbFile,
         thumbObjUrl,
-        setThumbObjUrl,
         existingThumb,
-        setExistingThumb,
         existingPreviews,
-        setExistingPreviews,
         newPreviews,
-        setNewPreviews,
         previewsModified,
-        setPreviewsModified,
         users,
         selectedContribs,
         setSelectedContribs,
-        contribDropOpen,
-        setContribDropOpen,
-        contribSearch,
-        setContribSearch,
-        contribRef,
         loadingData,
         isSubmitting,
         error,
-        thumbInputRef,
-        previewInputRef,
         handleClose,
         handleThumbnailChange,
-        onThumbDrop,
         addPreviewFiles,
         removeNewPreview,
         removeExistingPreview,
-        onPreviewDrop,
-        toggleContrib,
-        filteredUsers,
         handleSubmit,
-        selectedLabels,
     };
 }

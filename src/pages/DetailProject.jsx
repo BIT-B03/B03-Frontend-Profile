@@ -13,8 +13,10 @@ import BackgroundLayout from '../components/layout/GuestMemberBackground';
 function DetailProject() {
     const navItems = [
         { label: 'Home', href: '/' },
-        { label: 'Project', href: '/project' },
-        { label: 'People', href: '/people' }
+        { label: 'About', href: '/about' },
+        { label: 'Contact', href: '/contact' },
+        { label: 'People', href: '/people' },
+        { label: 'Project', href: '/project' }
     ];
     const [projectData, setProjectData] = useState(null);
     const [loading, setLoading] = useState(true);
