@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     SetAuthToken,
     getApplicantRetention,
@@ -31,6 +31,7 @@ export default function useAdminSettings() {
     const [generationStatus, setGenerationStatus] = useState(null);
     const [generationLoading, setGenerationLoading] = useState(false);
     const [generationSaving, setGenerationSaving] = useState(false);
+    const hasFetchedRef = useRef(false);
 
     // Ensure axios auth token is set when the hook is used
     useEffect(() => {
@@ -87,6 +88,8 @@ export default function useAdminSettings() {
     }, []);
 
     useEffect(() => {
+        if (hasFetchedRef.current) return;
+        hasFetchedRef.current = true;
         fetchRetention();
         fetchGeneration();
     }, [fetchRetention, fetchGeneration]);

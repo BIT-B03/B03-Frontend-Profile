@@ -16,7 +16,7 @@ const DescriptionSection = ({ description, className = '', loading = false }) =>
     return (
         <div className={`flex flex-col gap-6 ${className}`}>
             <div className="w-16 h-px bg-pure-white/20 block md:hidden" />
-            <p className="text-pure-white/90 text-lg md:text-xl leading-relaxed">
+            <p className="text-pure-white/90 text-lg md:text-xl leading-relaxed whitespace-pre-line">
                 {description}
             </p>
         </div>
