@@ -25,6 +25,7 @@ export default function useCreateProjectPage({ navigate }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
+  const [descriptionPrompt, setDescriptionPrompt] = useState({ open: false, projectId: null });
 
   useEffect(() => {
     document.body.style.overflow = mobileSidebarOpen ? 'hidden' : '';
@@ -139,6 +140,14 @@ export default function useCreateProjectPage({ navigate }) {
     }
   }, [deleteTarget]);
 
+  const handleCreateSuccess = useCallback(
+    (createdId) => {
+      fetchProjects(myHashedId);
+      setDescriptionPrompt({ open: true, projectId: createdId || null });
+    },
+    [fetchProjects, myHashedId]
+  );
+
   const isMount = useRef(true);
   useEffect(() => {
     if (isMount.current) {
@@ -187,8 +196,11 @@ export default function useCreateProjectPage({ navigate }) {
     deletingId,
     deleteError,
     setDeleteError,
+    descriptionPrompt,
+    setDescriptionPrompt,
     fetchProjects,
     handleDeleteClick,
     handleDeleteConfirm,
+    handleCreateSuccess,
   };
 }
