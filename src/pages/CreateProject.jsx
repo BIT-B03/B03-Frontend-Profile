@@ -5,6 +5,7 @@ import Header from '../components/common/Header';
 import ProjectCardCreate from '../components/createproject/ProjectCardCreate';
 import FilterSearchProject from '../components/createproject/FilterSearchProject';
 import CreateProjectModal from '../components/createproject/CreateProjectModal';
+import AddDescriptionPromptModal from '../components/createproject/AddDescriptionPromptModal';
 import DeleteConfirmModal from '../components/createproject/DeleteConfirmModal';
 import EditProjectModal from '../components/createproject/EditProjectModal';
 import useCreateProjectPage from '../hooks/useCreateProjectPage';
@@ -35,9 +36,12 @@ export default function CreateProject() {
     deletingId,
     deleteError,
     setDeleteError,
+    descriptionPrompt,
+    setDescriptionPrompt,
     fetchProjects,
     handleDeleteClick,
     handleDeleteConfirm,
+    handleCreateSuccess,
   } = useCreateProjectPage({ navigate });
 
   return (
@@ -134,7 +138,21 @@ export default function CreateProject() {
       <CreateProjectModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={() => fetchProjects(myHashedId)}
+        onSuccess={handleCreateSuccess}
+      />
+
+      <AddDescriptionPromptModal
+        isOpen={descriptionPrompt.open}
+        canAddDescription={!!descriptionPrompt.projectId}
+        onClose={() => setDescriptionPrompt({ open: false, projectId: null })}
+        onAddDescription={() => {
+          if (!descriptionPrompt.projectId) {
+            setDescriptionPrompt({ open: false, projectId: null });
+            return;
+          }
+          setDescriptionPrompt({ open: false, projectId: null });
+          navigate(`/create-project/${descriptionPrompt.projectId}/edit-description`);
+        }}
       />
     </div>
   );
