@@ -147,8 +147,18 @@ export const getUserPublicData = async (userHashedId) => {
 // Build avatar image URL from filename/path returned by API
 export const getAvatarImageUrl = (filename) => {
     if (!filename) return null;
-    const safe = filename.startsWith('/') ? filename.slice(1) : filename;
-    return `/api/userPublic/avatars/${safe}`;
+    if (filename.startsWith('http://') || filename.startsWith('https://')) return filename;
+
+    const cleaned = filename.startsWith('/') ? filename.slice(1) : filename;
+    if (cleaned.startsWith('api/userPublic/avatars/')) {
+        return `/${cleaned}`;
+    }
+
+    const normalized = cleaned.includes('uploads/avatars/')
+        ? cleaned.split('uploads/avatars/').pop()
+        : cleaned.split('/').pop();
+
+    return `/api/userPublic/avatars/${normalized}`;
 };
 
 // Fetch current authenticated user's profile

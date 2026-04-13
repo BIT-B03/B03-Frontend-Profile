@@ -7,6 +7,7 @@ export const clearAuthSession = () => {
 	localStorage.removeItem('role');
 	localStorage.removeItem('position');
 	localStorage.removeItem('avatar_url');
+	window.dispatchEvent(new Event('user-updated'));
 	ClearAuthToken();
 };
 

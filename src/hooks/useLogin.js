@@ -68,6 +68,7 @@ export default function useLogin() {
           if (position) {
             localStorage.setItem('position', position);
           }
+          window.dispatchEvent(new Event('user-updated'));
         } catch {
           // ignore storage errors
         }

@@ -3,7 +3,7 @@ import { getAvatarImageUrl } from '../api/api';
 
 const resolveAvatarUrl = (value) => {
   if (!value) return null;
-  if (value.startsWith('http://') || value.startsWith('https://') || value.startsWith('/')) return value;
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
   return getAvatarImageUrl(value);
 };
 
