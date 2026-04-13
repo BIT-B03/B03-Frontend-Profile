@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import BlurFrame, { CloseButton } from '../common/BlurFrame';
-import PositionRoleProfileCard from './PositionRoleProfileCard';
-import PositionRoleFields from './PositionRoleFields';
+import MemberSettingsProfileCard from './MemberSettingsProfileCard';
+import MemberSettingsFields from './MemberSettingsFields';
 import {
     deleteMemberDisplay,
     editMemberDisplay,
@@ -10,7 +10,7 @@ import {
     uploadMemberDisplay,
 } from '../../api/api';
 
-export default function PositionRoleModal({ isOpen, member, formState, onChange, onClose, onSave, isSaving, onMemberPatched }) {
+export default function MemberSettingsModal({ isOpen, member, formState, onChange, onClose, onSave, isSaving, onMemberPatched }) {
     const [profile, setProfile] = useState(null);
     const [profileLoading, setProfileLoading] = useState(false);
     const [profileError, setProfileError] = useState(null);
@@ -163,7 +163,7 @@ export default function PositionRoleModal({ isOpen, member, formState, onChange,
             <div className="relative px-6 py-5 border-b border-brand-stroke/40 bg-gradient-to-r from-brand-fill/60 via-brand-fill/40 to-brand-fill/60 backdrop-blur-xl">
                 <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                        <PositionRoleProfileCard
+                        <MemberSettingsProfileCard
                             member={member}
                             profile={profile}
                             profileLoading={profileLoading}
@@ -177,7 +177,7 @@ export default function PositionRoleModal({ isOpen, member, formState, onChange,
             </div>
 
             <div className="px-6 py-6 space-y-6 bg-gradient-to-b from-transparent to-brand-fill/20">
-                <PositionRoleFields
+                <MemberSettingsFields
                     formState={formState}
                     onChange={onChange}
                     photoSrc={photoSrc}

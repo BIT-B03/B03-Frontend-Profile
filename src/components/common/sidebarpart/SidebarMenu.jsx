@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
-import SidebarIcons from '../sidebarIcons';
+import { sidebarIconMap } from '../../../utils/icon';
 
 export default function SidebarMenu({ isCollapsed, activePath, menuItems, onGo }) {
   const storageKey = 'sidebar-submenu-state';
@@ -82,6 +82,12 @@ export default function SidebarMenu({ isCollapsed, activePath, menuItems, onGo }
     }),
   };
 
+  const renderIcon = (iconKey, sizeClass) => {
+    if (!iconKey) return null;
+    const Icon = sidebarIconMap[iconKey];
+    return Icon ? <Icon className={sizeClass} /> : null;
+  };
+
   return (
     <Menu menuItemStyles={menuItemStyles}>
       {menuItems.map((item) => {
@@ -89,7 +95,7 @@ export default function SidebarMenu({ isCollapsed, activePath, menuItems, onGo }
           return (
             <SubMenu
               key={item.label}
-              icon={SidebarIcons[item.iconKey] || null}
+              icon={renderIcon(item.iconKey, 'w-5 h-5')}
               label={item.label}
               title={isCollapsed ? item.label : undefined}
               open={isSubmenuOpen(item.label)}
@@ -105,7 +111,7 @@ export default function SidebarMenu({ isCollapsed, activePath, menuItems, onGo }
               {item.children.map((child) => (
                 <MenuItem
                   key={child.path}
-                  icon={child.iconKey ? SidebarIcons[child.iconKey] : null}
+                  icon={renderIcon(child.iconKey, 'w-4 h-4')}
                   active={activePath === child.path}
                   onClick={() => {
                     const nextState = {
@@ -127,7 +133,7 @@ export default function SidebarMenu({ isCollapsed, activePath, menuItems, onGo }
         return (
           <MenuItem
             key={item.path}
-            icon={SidebarIcons[item.iconKey] || null}
+            icon={renderIcon(item.iconKey, 'w-5 h-5')}
             active={activePath === item.path}
             onClick={() => onGo(item.path)}
             title={isCollapsed ? item.label : undefined}

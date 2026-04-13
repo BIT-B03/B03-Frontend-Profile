@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import { updateAdminMember } from '../api/api';
 
-// Hook to handle updating member's role/position/generation for the Position & Role page
-export function usePositionRoleUpdate({ onSuccess } = {}) {
+// Hook to handle updating member's role/position/generation for the Member Settings page
+export function useMemberSettingsUpdate({ onSuccess } = {}) {
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState(null);
 
@@ -48,7 +48,7 @@ export function usePositionRoleUpdate({ onSuccess } = {}) {
                     onSuccess({ member, payload, result });
                 }
             } catch (err) {
-                console.error('Failed to update member position/role', err);
+                console.error('Failed to update member settings', err);
                 setError('Failed to save changes. Please try again.');
                 throw err;
             } finally {

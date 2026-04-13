@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import Logo from '../assets/git-lab-svgrepo-com.svg'
+import Logo from '../assets/bitlogo.png'
 import { useNavigate } from 'react-router-dom'
 
 export default function Navbar({

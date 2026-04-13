@@ -16,7 +16,7 @@ function formatMemberSecondaryLine(member) {
     return parts.join(' • ');
 }
 
-export default function PositionRoleMemberCard({ member, onEdit }) {
+export default function MemberSettingsMemberCard({ member, onEdit }) {
     const avatarSrc = member?.avatar_url ? getAvatarImageUrl(member.avatar_url) : null;
     const initials = getMemberInitials(member?.name || '');
     const secondaryLine = formatMemberSecondaryLine(member);

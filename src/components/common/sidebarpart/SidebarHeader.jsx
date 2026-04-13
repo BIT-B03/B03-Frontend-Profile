@@ -1,4 +1,5 @@
 import React from 'react';
+import Logo from '../../../assets/bitlogo.png';
 const HamburgerIcon = ({ className = 'w-5 h-5' }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -13,15 +14,8 @@ export default function SidebarHeader({ isCollapsed, showMobileClose, onMobileCl
         style={{ background: 'radial-gradient(circle, #24e1c9 0%, transparent 70%)' }}
       />
 
-      <div
-        className="relative shrink-0 grid place-items-center w-10 h-10 rounded-xl"
-        style={{
-          background: 'linear-gradient(135deg, rgba(36,225,201,0.25) 0%, rgba(31,76,116,0.4) 100%)',
-          border: '1px solid rgba(36,225,201,0.35)',
-          boxShadow: '0 0 14px rgba(36,225,201,0.2)',
-        }}
-      >
-        <span className="text-sm font-extrabold text-brand-24e1c9 tracking-wide">B</span>
+      <div className="relative shrink-0 grid place-items-center w-10 h-10">
+        <img src={Logo} alt="BIT-B03 logo" className="w-8 h-8" />
       </div>
 
       {!isCollapsed && (

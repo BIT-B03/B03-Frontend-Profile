@@ -5,15 +5,15 @@ import GuestMemberBackground from '../components/layout/GuestMemberBackground';
 import useSidebarCollapsed from '../hooks/useSidebarCollapsed';
 import EmptyState from '../components/filter/EmptyState';
 import MemberFilters from '../components/member/common/MemberFilters';
-import PositionRoleMemberCard from '../components/position-role/PositionRoleMemberCard';
-import PositionRoleModal from '../components/position-role/PositionRoleModal';
+import MemberSettingsMemberCard from '../components/member-settings/MemberSettingsMemberCard';
+import MemberSettingsModal from '../components/member-settings/MemberSettingsModal';
 import Pagination from '../components/filter/Pagination';
 import useQueryPagination from '../hooks/useQueryPagination';
 import usePagedMembersData from '../hooks/usePagedMembersData';
 import { getAdminMembers } from '../api/api';
-import { usePositionRoleUpdate } from '../hooks/usePositionRoleUpdate';
+import { useMemberSettingsUpdate } from '../hooks/useMemberSettingsUpdate';
 
-export default function PositionRole() {
+export default function MemberSettings() {
     const [collapsed, setCollapsed] = useSidebarCollapsed();
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const [activeMember, setActiveMember] = useState(null);
@@ -42,7 +42,7 @@ export default function PositionRole() {
         searchTerm,
         itemsPerPage,
     });
-    const { isSaving, saveMemberChanges } = usePositionRoleUpdate({
+    const { isSaving, saveMemberChanges } = useMemberSettingsUpdate({
         onSuccess: ({ member }) => {
             if (!member?.hashed_id) return;
 
@@ -155,7 +155,7 @@ export default function PositionRole() {
                                 <div key={animationKey} className={`${isTransitioning ? 'opacity-75 pointer-events-none transition-opacity duration-300' : ''}`}>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {visibleUsers.map((member) => (
-                                            <PositionRoleMemberCard
+                                            <MemberSettingsMemberCard
                                                 key={member.hashed_id}
                                                 member={member}
                                                 onEdit={() => handleOpenEdit(member)}
@@ -177,7 +177,7 @@ export default function PositionRole() {
                         </section>
                     </div>
 
-                    <PositionRoleModal
+                    <MemberSettingsModal
                         isOpen={Boolean(activeMember)}
                         member={activeMember}
                         formState={formState}

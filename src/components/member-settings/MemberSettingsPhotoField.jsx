@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import ImageWithSkeleton from '../member/common/ImageWithSkeleton';
 import ImageCropModal from '../common/ImageCropModal';
 
-export default function PositionRolePhotoField({
+export default function MemberSettingsPhotoField({
     src,
     alt,
     placeholderLetter,
@@ -52,7 +52,7 @@ export default function PositionRolePhotoField({
 
     const handleCropSave = (blob) => {
         if (!blob) return;
-        const file = new File([blob], `position-role-${Date.now()}.jpg`, { type: blob.type || 'image/jpeg' });
+        const file = new File([blob], `member-settings-${Date.now()}.jpg`, { type: blob.type || 'image/jpeg' });
         onPickFile?.(file, null);
         if (rawImage && rawImage.startsWith('blob:')) {
             URL.revokeObjectURL(rawImage);
