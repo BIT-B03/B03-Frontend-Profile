@@ -22,7 +22,7 @@ export default function Header({
 
   const resolvedAvatar = React.useMemo(() => {
     if (!avatarUrl) return null;
-    if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://') || avatarUrl.startsWith('/')) {
+    if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
       return avatarUrl;
     }
     return getAvatarImageUrl(avatarUrl);

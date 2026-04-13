@@ -25,6 +25,7 @@ export default function useMyProfile() {
         } else {
           localStorage.removeItem('avatar_url');
         }
+        window.dispatchEvent(new Event('user-updated'));
       }
       return data;
     } catch (err) {

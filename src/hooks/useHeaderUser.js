@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { GetMyProfile } from '../api/api';
 
 /**
  * Returns inline style for the position badge based on role hierarchy.
@@ -44,6 +45,8 @@ const readHeaderUser = () => ({
 
 export default function useHeaderUser() {
   const [user, setUser] = useState(readHeaderUser);
+  const hasRequestedProfile = useRef(false);
+  const lastTokenRef = useRef(null);
 
   useEffect(() => {
     const handleStorage = (event) => {
@@ -51,9 +54,61 @@ export default function useHeaderUser() {
       setUser(readHeaderUser());
     };
 
+    const handleUserUpdated = () => {
+      setUser(readHeaderUser());
+    };
+
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener('user-updated', handleUserUpdated);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('user-updated', handleUserUpdated);
+    };
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth_access_token');
+    if (token !== lastTokenRef.current) {
+      lastTokenRef.current = token;
+      hasRequestedProfile.current = false;
+      setUser(readHeaderUser());
+    }
+
+    if (!token) return;
+    if (hasRequestedProfile.current) return;
+    if (user?.avatarUrl) return;
+
+    hasRequestedProfile.current = true;
+
+    const run = async () => {
+      try {
+        const response = await GetMyProfile();
+        const data = response?.data ?? response;
+        const nextAvatar = data?.avatar_url || null;
+        const nextUsername = data?.username || data?.name || null;
+        const nextPosition = data?.position || null;
+
+        if (nextAvatar) {
+          localStorage.setItem('avatar_url', nextAvatar);
+        }
+        if (nextUsername) {
+          localStorage.setItem('username', nextUsername);
+        }
+        if (nextPosition) {
+          localStorage.setItem('position', nextPosition);
+        }
+
+        if (nextAvatar || nextUsername || nextPosition) {
+          setUser(readHeaderUser());
+          window.dispatchEvent(new Event('user-updated'));
+        }
+      } catch {
+        // silent: keep header usable even if profile fetch fails
+      }
+    };
+
+    run();
+  }, [user?.avatarUrl]);
 
   return user;
 }
