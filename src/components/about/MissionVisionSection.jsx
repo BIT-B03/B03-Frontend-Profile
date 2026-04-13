@@ -1,4 +1,5 @@
 import React from 'react'
+import { aboutIconMap } from '../../utils/icon'
 
 export default function MissionVisionSection() {
   return (
@@ -29,9 +30,7 @@ export default function MissionVisionSection() {
               <div className="flex items-center gap-4 mb-5">
                 <div className="flex-shrink-0">
                   <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-gradient-to-br from-[#24E1C9]/30 to-[#24E1C9]/10 border border-[#24E1C9]/30">
-                    <svg className="h-7 w-7 text-[#24E1C9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                    <aboutIconMap.mission className="h-7 w-7 text-[#24E1C9]" />
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-white">Mission</h3>
@@ -49,10 +48,7 @@ export default function MissionVisionSection() {
               <div className="flex items-center gap-4 mb-5">
                 <div className="flex-shrink-0">
                   <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-gradient-to-br from-[#1F4C74]/30 to-[#1F4C74]/10 border border-[#1F4C74]/30">
-                    <svg className="h-7 w-7 text-[#1F4C74]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
+                    <aboutIconMap.vision className="h-7 w-7 text-[#1F4C74]" />
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-white">Vision</h3>

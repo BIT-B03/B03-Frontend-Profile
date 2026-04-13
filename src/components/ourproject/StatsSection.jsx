@@ -1,13 +1,11 @@
 import React from 'react'
-import AllProjectSvg from '../../assets/allproject.svg'
-import OnProgressSvg from '../../assets/onprogres.svg'
-import CompleteSvg from '../../assets/complete.svg'
+import { ourProjectIconMap } from '../../utils/icon'
 
 const cards = [
   {
     label: 'TOTAL PROJECT',
     key: 'total',
-    icon: AllProjectSvg,
+    icon: ourProjectIconMap.totalProjects,
     accentColor: '#979797',
     glowColor: 'rgba(151,151,151,0.20)',
     borderColor: 'rgba(151,151,151,0.25)',
@@ -17,7 +15,7 @@ const cards = [
   {
     label: 'ON PROGRESS',
     key: 'progress',
-    icon: OnProgressSvg,
+    icon: ourProjectIconMap.inProgress,
     accentColor: '#980000',
     glowColor: 'rgba(152,0,0,0.30)',
     borderColor: 'rgba(152,0,0,0.30)',
@@ -27,7 +25,7 @@ const cards = [
   {
     label: 'COMPLETED',
     key: 'complete',
-    icon: CompleteSvg,
+    icon: ourProjectIconMap.completed,
     accentColor: '#22A5A7',
     glowColor: 'rgba(34,165,167,0.30)',
     borderColor: 'rgba(34,165,167,0.25)',
@@ -40,7 +38,7 @@ export default function StatsSection({ stats = { total: 0, progress: 0, complete
   return (
     <section className="max-w-5xl mx-auto px-6 mb-12 relative z-10 -mt-20 md:-mt-28">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {cards.map(({ label, key, icon, accentColor, glowColor, borderColor, iconBg, numberColor }) => (
+        {cards.map(({ label, key, icon: Icon, accentColor, glowColor, borderColor, iconBg, numberColor }) => (
           <div
             key={key}
             className="group relative rounded-2xl p-6 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 overflow-hidden cursor-default border border-white/10 ring-1 ring-white/10"
@@ -88,7 +86,7 @@ export default function StatsSection({ stats = { total: 0, progress: 0, complete
                   boxShadow: `0 0 18px ${glowColor}`,
                 }}
               >
-                <img src={icon} alt={label} className="w-7 h-7" />
+                <Icon className="w-7 h-7" style={{ color: numberColor }} aria-hidden />
               </div>
 
               {/* label + number */}

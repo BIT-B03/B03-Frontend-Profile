@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getProjectThumbnailImageUrl } from '../../../api/api';
+import { ourProjectIconMap } from '../../../utils/icon';
 
 const ProjectPreviewCard = ({ thumbnail, title }) => {
     const imageSrc = getProjectThumbnailImageUrl(thumbnail);
@@ -21,9 +22,7 @@ const ProjectPreviewCard = ({ thumbnail, title }) => {
                         />
                     ) : (
                         <div className="w-full h-full bg-gradient-to-br from-brand-186bb5 to-brand-1f4c74 flex items-center justify-center">
-                            <svg className="w-24 h-24 text-pure-white opacity-50" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
-                            </svg>
+                            <ourProjectIconMap.imagePlaceholder className="w-24 h-24 text-pure-white opacity-50" />
                         </div>
                     )}
 

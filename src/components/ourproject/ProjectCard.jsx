@@ -1,6 +1,7 @@
 import React from 'react'
 import { getAvatarImageUrl } from '../../api/api'
 import { getProjectStatusMeta } from '../../utils/projectStatus'
+import { ourProjectIconMap } from '../../utils/icon'
 
 export default function ProjectCard({ project, onViewDetail, maxDescriptionWords = 50 }) {
   const membersList = []
@@ -65,9 +66,7 @@ export default function ProjectCard({ project, onViewDetail, maxDescriptionWords
             display: project.thumbnail_url ? 'none' : 'flex'
           }}
         >
-          <svg className="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
-          </svg>
+          <ourProjectIconMap.imagePlaceholder className="w-16 h-16 text-gray-600" />
         </div>
 
         {/* Status Badge */}
