@@ -52,6 +52,7 @@ API.interceptors.response.use(
             localStorage.removeItem("hashed_id");
             localStorage.removeItem("position");
             localStorage.removeItem("role");
+            localStorage.removeItem("avatar_url");
 
             ClearAuthToken();
             if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
