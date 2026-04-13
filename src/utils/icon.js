@@ -1,3 +1,5 @@
+// icon mapping for sidebar and toolbar
+// feather icons
 import {
     FiAlignLeft,
     FiAlignCenter,
@@ -10,11 +12,47 @@ import {
     FiCode,
     FiCornerUpLeft,
     FiCornerUpRight,
+    FiHome,
+    FiGrid,
+    FiUsers,
+    FiFolder,
+    FiUser,
+    FiSettings,
+    FiClock,
 } from 'react-icons/fi';
+
+// remix icons
+import {
+    RiChatDeleteLine,
+    RiFileCheckLine,
+}from 'react-icons/ri';
+
+// font awesome
+
+import {
+    FaUsersGear
+} from 'react-icons/fa6';
+
+// material design
 import {
     MdOutlineFormatListNumbered,
     MdFormatStrikethrough,
+    MdOutlinePersonRemove,
 } from 'react-icons/md';
+
+
+export const sidebarIconMap = {
+    home: FiHome,
+    dashboard: FiGrid,
+    members: FiUsers,
+    project: FiFolder,
+    kickRequest: RiChatDeleteLine,
+    profile: FiUser,
+    settings: FiSettings,
+    createKickRequest: MdOutlinePersonRemove,
+    memberSettings: FaUsersGear,
+    confirmPelamar: RiFileCheckLine,
+};
 
 
 export const getToolbarItems = (editor) => ([

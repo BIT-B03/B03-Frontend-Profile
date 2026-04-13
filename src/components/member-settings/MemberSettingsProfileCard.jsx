@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { getAvatarImageUrl } from '../../api/api';
 
-export default function PositionRoleProfileCard({ member, profile, profileLoading, profileError }) {
+export default function MemberSettingsProfileCard({ member, profile, profileLoading, profileError }) {
     const displayName = profile?.name || member?.name || 'Selected member';
     const displayEmail = profile?.email || member?.email || 'Email tidak tersedia';
 

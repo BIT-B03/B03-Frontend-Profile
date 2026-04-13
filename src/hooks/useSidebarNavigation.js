@@ -54,7 +54,7 @@ export default function useSidebarNavigation({ onClose } = {}) {
           { label: 'Kick Request', path: '/member-management/kick-request', iconKey: 'kickRequest', roles: ['superuser', 'admin', 'koordinator'] },
           { label: 'Create Kick Request', path: '/member-management/kick-request/create', iconKey: 'createKickRequest', roles: ['superuser', 'admin', 'koordinator'] },
           { label: 'Confirm Pelamar', path: '/member-management/confirm-pelamar', iconKey: 'confirmPelamar', roles: ['superuser', 'admin', 'koordinator'] },
-          { label: 'Position Role', path: '/member-management/position-role', iconKey: 'positionRole', roles: ['superuser', 'admin', 'koordinator'] },
+          { label: 'Member Settings', path: '/member-management/member-settings', iconKey: 'memberSettings', roles: ['superuser', 'admin', 'koordinator'] },
         ],
       },
       { label: 'My Project', path: '/create-project', iconKey: 'project', roles: ['superuser', 'admin', 'user'] },

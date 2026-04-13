@@ -21,7 +21,7 @@ import ProtectedRoute from './utils/ProtectRoute';
 import KickRequests from './pages/KickRequests.jsx';
 import CreateKickRequest from './pages/CreateKickRequest.jsx';
 import ConfirmPelamar from './pages/ConfirmPelamar.jsx';
-import PositionRole from './pages/PositionRole.jsx';
+import MemberSettings from './pages/MemberSettings.jsx';
 import Profile from './pages/Profile.jsx';
 import CreateProject from './pages/CreateProject.jsx';
 import DetailProjectCreate from './pages/DetailProjectCreate.jsx';
@@ -40,7 +40,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <Route path="member-management/kick-request" element={<ProtectedRoute> <KickRequests /> </ProtectedRoute>} />
                     <Route path="member-management/kick-request/create" element={<ProtectedRoute> <CreateKickRequest /> </ProtectedRoute>} />
                     <Route path="member-management/confirm-pelamar" element={<ProtectedRoute> <ConfirmPelamar /> </ProtectedRoute>} />
-                    <Route path="member-management/position-role" element={<ProtectedRoute> <PositionRole /> </ProtectedRoute>} />
+                    <Route path="member-management/member-settings" element={<ProtectedRoute> <MemberSettings /> </ProtectedRoute>} />
                     <Route path="profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
                     <Route path="settings" element={<ProtectedRoute> <Settings /> </ProtectedRoute>} />
                     <Route path="create-project" element={<ProtectedRoute> <CreateProject /> </ProtectedRoute>} />

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import PositionRolePhotoField from './PositionRolePhotoField';
+import MemberSettingsPhotoField from './MemberSettingsPhotoField';
 
 const generationIcon = '/svg/icon-generation.svg';
 const roleIcon = '/svg/icon-role.svg';
@@ -99,7 +99,7 @@ function NumberField({ id, label, iconSrc, value, onChange, min = 1, max, requir
     );
 }
 
-export default function PositionRoleFields({
+export default function MemberSettingsFields({
     formState,
     onChange,
     photoSrc,
@@ -133,7 +133,7 @@ export default function PositionRoleFields({
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {onPickPhoto && (
-                <PositionRolePhotoField
+                <MemberSettingsPhotoField
                     src={photoSrc}
                     alt={photoAlt}
                     placeholderLetter={photoPlaceholderLetter}
@@ -146,7 +146,7 @@ export default function PositionRoleFields({
                 />
             )}
             <NumberField
-                id="position-role-generation"
+                id="member-settings-generation"
                 label="Generation"
                 iconSrc={generationIcon}
                 value={formState.generation}
@@ -156,7 +156,7 @@ export default function PositionRoleFields({
                 disabled={disabled}
             />
             <SelectField
-                id="position-role-role"
+                id="member-settings-role"
                 label="Role"
                 iconSrc={roleIcon}
                 value={formState.role}
@@ -166,7 +166,7 @@ export default function PositionRoleFields({
             />
             <div className="sm:col-span-2">
                 <SelectField
-                    id="position-role-position"
+                    id="member-settings-position"
                     label="Position"
                     iconSrc={positionIcon}
                     value={formState.position}
