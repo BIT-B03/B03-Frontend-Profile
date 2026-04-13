@@ -113,7 +113,7 @@ const PreviewGallery = ({ previews = [], title, description, showTitleAndDescrip
                 <div className="bg-brand-fill border border-brand-stroke rounded-3xl p-6 md:p-8 shadow-2xl">
                     {title && (
                         <>
-                            <h2 className="text-2xl md:text-3xl font-bold text-pure-white font-inter mb-2">
+                            <h2 className="text-2xl md:text-3xl font-bold text-pure-white font-inter mb-2 break-words">
                                 {title}
                             </h2>
 
@@ -129,7 +129,7 @@ const PreviewGallery = ({ previews = [], title, description, showTitleAndDescrip
 
                     {safeDescription && (
                         <div
-                            className="tiptap-render text-pure-white/90 text-sm md:text-base leading-relaxed"
+                            className="tiptap-render text-pure-white/90 text-sm md:text-base leading-relaxed break-words"
                             dangerouslySetInnerHTML={{ __html: safeDescription }}
                         />
                     )}
@@ -176,6 +176,12 @@ const PreviewGallery = ({ previews = [], title, description, showTitleAndDescrip
                 .swiper-slide-thumb-active > div {
                     border-color: rgba(96, 165, 250, 0.9);
                     box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+                }
+
+                .tiptap-render,
+                .tiptap-render * {
+                    overflow-wrap: anywhere;
+                    word-break: break-word;
                 }
             `}</style>
         </>
