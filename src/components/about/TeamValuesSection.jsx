@@ -1,42 +1,27 @@
 import React from 'react'
+import { aboutIconMap } from '../../utils/icon'
 
 export default function TeamValuesSection() {
   const values = [
     {
       title: 'Collaboration',
       description: 'We believe in the power of teamwork. Every member brings unique skills and perspectives that create something greater together.',
-      icon: (
-        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.657" />
-        </svg>
-      )
+      icon: aboutIconMap.collaboration,
     },
     {
       title: 'Innovation',
       description: 'We push boundaries and explore new possibilities. Innovation is at the heart of everything we do, from projects to processes.',
-      icon: (
-        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5.36 4.364l-.707.707M5.636 5.636l.707.707" />
-        </svg>
-      )
+      icon: aboutIconMap.innovation,
     },
     {
       title: 'Integrity',
       description: 'We operate with transparency and honesty. Trust is the foundation of our community and every interaction we build.',
-      icon: (
-        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
+      icon: aboutIconMap.integrity,
     },
     {
       title: 'Growth',
       description: 'We embrace continuous learning and development. Every challenge is an opportunity to grow stronger and wiser.',
-      icon: (
-        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8L5.257 19.393A4 4 0 005 15.071V5a4 4 0 014-4h6a4 4 0 014 4v10.071a4 4 0 01-.757 2.322z" />
-        </svg>
-      )
+      icon: aboutIconMap.growth,
     }
   ]
 
@@ -72,7 +57,7 @@ export default function TeamValuesSection() {
                 <div className="flex items-start gap-4 mb-4">
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-gradient-to-br from-[#24E1C9]/20 to-[#1F4C74]/20 border border-[#24E1C9]/30">
-                      <span className="text-[#24E1C9]">{value.icon}</span>
+                      <value.icon className="h-6 w-6 text-[#24E1C9]" />
                     </div>
                   </div>
                   <h3 className="text-xl font-bold text-white">{value.title}</h3>

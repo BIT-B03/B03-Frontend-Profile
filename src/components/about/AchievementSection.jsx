@@ -1,60 +1,37 @@
 import React from 'react'
+import { aboutIconMap } from '../../utils/icon'
 
 export default function AchievementSection() {
   const achievements = [
     {
       number: '500+',
       label: 'Active Members',
-      icon: (
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.657" />
-        </svg>
-      )
+      icon: aboutIconMap.activeMembers,
     },
     {
       number: '85+',
       label: 'Projects Completed',
-      icon: (
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      )
+      icon: aboutIconMap.projectsCompleted,
     },
     {
       number: '120+',
       label: 'Industry Partners',
-      icon: (
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.581m0 0H9.114m5.305 0a8.1 8.1 0 002.052-5.396" />
-        </svg>
-      )
+      icon: aboutIconMap.industryPartners,
     },
     {
       number: '15',
       label: 'Countries Reached',
-      icon: (
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20H7m6-4h.01" />
-        </svg>
-      )
+      icon: aboutIconMap.countriesReached,
     },
     {
       number: '$2.5M+',
       label: 'Value Created',
-      icon: (
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
+      icon: aboutIconMap.valueCreated,
     },
     {
       number: '98%',
       label: 'Member Satisfaction',
-      icon: (
-        <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
+      icon: aboutIconMap.memberSatisfaction,
     }
   ]
 
@@ -88,7 +65,7 @@ export default function AchievementSection() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#24E1C9]/10 to-[#1F4C74]/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300" />
               <div className="relative rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-6 sm:p-8 backdrop-blur-xl text-center h-full flex flex-col items-center justify-center">
                 <div className="mb-4 p-3 rounded-lg bg-gradient-to-br from-[#24E1C9]/20 to-[#1F4C74]/20 border border-[#24E1C9]/30 text-[#24E1C9]">
-                  {achievement.icon}
+                  <achievement.icon className="h-8 w-8" />
                 </div>
                 <div className="text-3xl sm:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300 mb-2">
                   {achievement.number}

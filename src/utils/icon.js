@@ -19,6 +19,18 @@ import {
     FiUser,
     FiSettings,
     FiClock,
+    FiZap,
+    FiBriefcase,
+    FiGlobe,
+    FiDollarSign,
+    FiSmile,
+    FiEye,
+    FiCpu,
+    FiCheckCircle,
+    FiTrendingUp,
+    FiArrowRight,
+    FiMail,
+    FiImage,
 } from 'react-icons/fi';
 
 // remix icons
@@ -30,7 +42,8 @@ import {
 // font awesome
 
 import {
-    FaUsersGear
+    FaUsersGear,
+    FaWhatsapp
 } from 'react-icons/fa6';
 
 // material design
@@ -52,6 +65,34 @@ export const sidebarIconMap = {
     createKickRequest: MdOutlinePersonRemove,
     memberSettings: FaUsersGear,
     confirmPelamar: RiFileCheckLine,
+};
+
+export const aboutIconMap = {
+    activeMembers: FiUsers,
+    projectsCompleted: FiZap,
+    industryPartners: FiBriefcase,
+    countriesReached: FiGlobe,
+    valueCreated: FiDollarSign,
+    memberSatisfaction: FiSmile,
+    mission: FiZap,
+    vision: FiEye,
+    collaboration: FiUsers,
+    innovation: FiCpu,
+    integrity: FiCheckCircle,
+    growth: FiTrendingUp,
+    arrowRight: FiArrowRight,
+};
+
+export const contactIconMap = {
+    email: FiMail,
+    whatsapp: FaWhatsapp,
+};
+
+export const ourProjectIconMap = {
+    imagePlaceholder: FiImage,
+    totalProjects: FiGrid,
+    inProgress: FiClock,
+    completed: FiCheckCircle,
 };
 
 

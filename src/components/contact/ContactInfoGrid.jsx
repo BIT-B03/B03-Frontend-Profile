@@ -1,17 +1,16 @@
 import React from 'react';
-import { FiMail } from 'react-icons/fi';
-import { FaWhatsapp } from 'react-icons/fa';
+import { contactIconMap } from '../../utils/icon';
 import ContactInfoCard from './ContactInfoCard';
 
 const CONTACT_ITEMS = [
     {
         title: 'Email',
-        icon: <FiMail className="w-5 h-5" />,
+        icon: <contactIconMap.email className="w-5 h-5" />,
         lines: ['bitlab.workspace@gmail.com'],
     },
     {
         title: 'WhatsApp',
-        icon: <FaWhatsapp className="w-6 h-6" />,
+        icon: <contactIconMap.whatsapp className="w-6 h-6" />,
         lines: ['+62 821-4337-2593'],
     },
 ];

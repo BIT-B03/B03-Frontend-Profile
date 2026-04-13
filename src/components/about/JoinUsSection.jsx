@@ -1,4 +1,5 @@
 import React from 'react'
+import { aboutIconMap } from '../../utils/icon'
 import { useNavigate } from 'react-router-dom'
 
 export default function JoinUsSection() {
@@ -58,9 +59,7 @@ export default function JoinUsSection() {
           >
             <span className="relative z-10 flex items-center gap-2">
               Start Your Journey
-              <svg className="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <aboutIconMap.arrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </span>
           </button>
 
@@ -70,9 +69,7 @@ export default function JoinUsSection() {
           >
             <span className="flex items-center gap-2">
               Meet Our Community
-              <svg className="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <aboutIconMap.arrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </span>
           </button>
         </div>
