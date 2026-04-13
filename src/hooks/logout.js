@@ -6,6 +6,7 @@ export const clearAuthSession = () => {
 	localStorage.removeItem('hashed_id');
 	localStorage.removeItem('role');
 	localStorage.removeItem('position');
+	localStorage.removeItem('avatar_url');
 	ClearAuthToken();
 };
 

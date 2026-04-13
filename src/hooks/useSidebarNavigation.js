@@ -43,6 +43,7 @@ export default function useSidebarNavigation({ onClose } = {}) {
 
   const menuItems = useMemo(() => {
     const items = [
+      { label: 'Home', path: '/', iconKey: 'home', roles: ['superuser', 'admin', 'user'] },
       { label: 'Dashboard', path: '/dashboard', iconKey: 'dashboard', roles: ['superuser', 'admin', 'user'] },
       { label: 'Profile', path: '/profile', iconKey: 'profile', roles: ['superuser', 'admin', 'user'] },
       {

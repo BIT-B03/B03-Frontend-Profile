@@ -3,11 +3,12 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import BackgroundLayout from '../components/layout/GuestMemberBackground';
 import RegisterForm from '../components/register/RegisterForm';
+import useAuthCheck from '../hooks/useAuthCheck';
 
 // Navbar configured to hide nav items and show brand/login CTA
 
-
 function Register() {
+  useAuthCheck('/dashboard');
   return (
     <BackgroundLayout>
       <Navbar

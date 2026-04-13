@@ -3,8 +3,11 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import BackgroundLayout from '../components/layout/GuestMemberBackground';
 import LoginForm from '../components/login/LoginForm';
+import useAuthCheck from '../hooks/useAuthCheck';
 
 function LoginPage() {
+  useAuthCheck('/dashboard');
+
   return (
     <BackgroundLayout>
       <Navbar
