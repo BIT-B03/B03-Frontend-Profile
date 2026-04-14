@@ -5,6 +5,7 @@ import {
     editProject,
 } from '../api/api';
 import { buildObjectUrl } from '../utils/createprojectmodal';
+import useImageCropQueue from './useImageCropQueue';
 
 const normalizeStatusValue = (raw = '') => {
     const s = raw.toLowerCase();
@@ -67,7 +68,7 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
 
                 const previews = Array.isArray(p.preview) ? p.preview
                     : Array.isArray(p.previews) ? p.previews
-                    : [];
+                        : [];
                 setExistingPreviews(
                     previews
                         .map((pr) => {
@@ -107,6 +108,37 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
         };
     }, []);
 
+    const handleCropResult = useCallback((croppedFile, target) => {
+        if (target === 'thumbnail') {
+            if (thumbObjUrl) URL.revokeObjectURL(thumbObjUrl);
+            setThumbFile(croppedFile);
+            setThumbObjUrl(buildObjectUrl(croppedFile));
+            setExistingThumb(null);
+            return;
+        }
+
+        if (target === 'preview') {
+            const url = buildObjectUrl(croppedFile);
+            setNewPreviews((prev) => [...prev, { file: croppedFile, url }]);
+            setPreviewsModified(true);
+        }
+    }, [thumbObjUrl]);
+
+    const {
+        modalProps: cropModalProps,
+        openCrop,
+        openCropQueue,
+        closeCrop,
+    } = useImageCropQueue({
+        aspect: 16 / 9,
+        cropShape: 'rect',
+        showGrid: true,
+        title: 'Crop Image',
+        subtitle: 'Adjust the frame for a 16:9 crop.',
+        saveLabel: 'Use Image',
+        onCropped: handleCropResult,
+    });
+
     const resetForm = useCallback(() => {
         setTitle('');
         setDescription('');
@@ -128,25 +160,19 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
 
     const handleClose = useCallback(() => {
         if (isSubmitting) return;
+        closeCrop();
         resetForm();
         onClose();
-    }, [isSubmitting, onClose, resetForm]);
+    }, [isSubmitting, closeCrop, onClose, resetForm]);
 
     const handleThumbnailChange = useCallback((file) => {
         if (!file) return;
-        if (thumbObjUrl) URL.revokeObjectURL(thumbObjUrl);
-        setThumbFile(file);
-        setThumbObjUrl(buildObjectUrl(file));
-        setExistingThumb(null);
-    }, [thumbObjUrl]);
+        openCrop(file, 'thumbnail');
+    }, [openCrop]);
 
     const addPreviewFiles = useCallback((files) => {
-        const arr = Array.from(files || []);
-        if (!arr.length) return;
-        const entries = arr.map((file) => ({ file, url: buildObjectUrl(file) }));
-        setNewPreviews((prev) => [...prev, ...entries]);
-        setPreviewsModified(true);
-    }, []);
+        openCropQueue(files, 'preview');
+    }, [openCropQueue]);
 
     const removeNewPreview = useCallback((idx) => {
         setNewPreviews((prev) => {
@@ -237,5 +263,6 @@ export default function useEditProjectModal({ isOpen, projectId, onClose, onSucc
         removeNewPreview,
         removeExistingPreview,
         handleSubmit,
+        cropModalProps,
     };
 }
