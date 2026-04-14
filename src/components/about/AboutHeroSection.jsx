@@ -49,30 +49,14 @@ export default function AboutHeroSection() {
               Empowering
             </span>
             <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#24E1C9] to-[#1F4C74]">
-              Innovation Leaders
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#24E1C9] to-[#357cbb]">
+              Innovation
             </span>
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-8">
-            We're a vibrant community dedicated to fostering innovation, collaboration, and lifelong learning. Since our founding, we've been on a mission to transform ideas into impactful solutions.
+           We are a community where people connect, share and build together, with a focus on making ideas useful and impactful. By working together and thinking creatively.
           </p>
-
-          {/* Quick stats */}
-          <div className="flex flex-wrap gap-4 sm:gap-6 justify-center">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-              <span className="text-2xl font-bold bg-gradient-to-r from-[#24E1C9] to-[#1F4C74] bg-clip-text text-transparent">5+</span>
-              <span className="text-xs sm:text-sm text-slate-400">Years Strong</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-              <span className="text-2xl font-bold bg-gradient-to-r from-[#24E1C9] to-[#1F4C74] bg-clip-text text-transparent">500+</span>
-              <span className="text-xs sm:text-sm text-slate-400">Members</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-              <span className="text-2xl font-bold bg-gradient-to-r from-[#24E1C9] to-[#1F4C74] bg-clip-text text-transparent">15</span>
-              <span className="text-xs sm:text-sm text-slate-400">Countries</span>
-            </div>
-          </div>
         </div>
       </div>
     </header>
