@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createProject, getAllUsers } from '../api/api';
 import { buildObjectUrl } from '../utils/createprojectmodal';
+import useImageCropQueue from './useImageCropQueue';
 
 export default function useCreateProjectForm({ isOpen, onClose, onSuccess }) {
   const [title, setTitle] = useState('');
@@ -35,7 +36,7 @@ export default function useCreateProjectForm({ isOpen, onClose, onSuccess }) {
         const list = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
         setUsers(list);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [isOpen]);
 
   useEffect(() => {
@@ -54,6 +55,36 @@ export default function useCreateProjectForm({ isOpen, onClose, onSuccess }) {
     };
   }, []);
 
+  const handleCropResult = useCallback((croppedFile, target) => {
+    if (target === 'thumbnail') {
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+      setThumbnail(croppedFile);
+      setThumbnailPreview(buildObjectUrl(croppedFile));
+      return;
+    }
+
+    if (target === 'preview') {
+      const url = buildObjectUrl(croppedFile);
+      setPreviews((prev) => [...prev, croppedFile]);
+      setPreviewUrls((prev) => [...prev, url]);
+    }
+  }, [thumbnailPreview]);
+
+  const {
+    modalProps: cropModalProps,
+    openCrop,
+    openCropQueue,
+    closeCrop,
+  } = useImageCropQueue({
+    aspect: 16 / 9,
+    cropShape: 'rect',
+    showGrid: true,
+    title: 'Crop Image',
+    subtitle: 'Adjust the frame for a 16:9 crop.',
+    saveLabel: 'Use Image',
+    onCropped: handleCropResult,
+  });
+
   const resetForm = useCallback(() => {
     setTitle('');
     setShortDescription('');
@@ -70,27 +101,22 @@ export default function useCreateProjectForm({ isOpen, onClose, onSuccess }) {
 
   const handleClose = useCallback(() => {
     if (isSubmitting) return;
+    closeCrop();
     resetForm();
     onClose();
-  }, [isSubmitting, onClose, resetForm]);
+  }, [isSubmitting, closeCrop, onClose, resetForm]);
 
   const handleThumbnailChange = useCallback(
     (file) => {
       if (!file) return;
-      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-      setThumbnail(file);
-      setThumbnailPreview(buildObjectUrl(file));
+      openCrop(file, 'thumbnail');
     },
-    [thumbnailPreview]
+    [openCrop]
   );
 
   const addPreviewFiles = useCallback((files) => {
-    const arr = Array.from(files || []);
-    if (!arr.length) return;
-    const urls = arr.map(buildObjectUrl);
-    setPreviews((prev) => [...prev, ...arr]);
-    setPreviewUrls((prev) => [...prev, ...urls]);
-  }, []);
+    openCropQueue(files, 'preview');
+  }, [openCropQueue]);
 
   const removePreview = useCallback((idx) => {
     URL.revokeObjectURL(previewUrls[idx]);
@@ -173,5 +199,6 @@ export default function useCreateProjectForm({ isOpen, onClose, onSuccess }) {
     removePreview,
     handleSubmit,
     handleClose,
+    cropModalProps,
   };
 }

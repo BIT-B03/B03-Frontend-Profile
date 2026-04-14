@@ -6,6 +6,7 @@ import {
   getProjectPreviewImageUrl,
   getAvatarImageUrl,
 } from '../../api/api'
+import ImageCropModal from '../common/ImageCropModal'
 import useEditProjectModal from '../../hooks/useEditProjectModal'
 import ContributorSelect from './editProjectModal/ContributorSelect'
 import { Field, PreviewPicker, ThumbnailPicker } from './editProjectModal/FormPieces'
@@ -38,6 +39,7 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
     removeExistingPreview,
     handleSubmit,
     setSelectedContribs,
+    cropModalProps,
   } = useEditProjectModal({ isOpen, projectId, onClose, onSuccess })
 
   const currentThumbSrc = thumbObjUrl || (existingThumb ? getProjectThumbnailImageUrl(existingThumb) : null)
@@ -201,6 +203,7 @@ export default function EditProjectModal({ isOpen, projectId, onClose, onSuccess
           </motion.div>
         </div>
       )}
+      <ImageCropModal {...cropModalProps} />
     </AnimatePresence>
   )
 }
