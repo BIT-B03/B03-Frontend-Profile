@@ -15,13 +15,6 @@ export default function FeatureCard({ icon, title, description }) {
           {description}
         </p>
       </div>
-
-      <button className="absolute bottom-4 right-4 w-10 h-10 rounded-full border border-white/20 flex items-center justify-center gap-1 hover:bg-white/5 transition">
-        <svg className="w-4 h-4 text-white/90 transform -rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M5 12h12" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M12 5l7 7-7 7" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
     </article>
   )
 }

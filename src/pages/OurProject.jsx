@@ -47,7 +47,7 @@ export default function OurProject() {
       <section className="relative pb-10 md:pb-20">
         <div className="max-w-5xl mx-auto px-6 py-16 text-center relative z-10 pt-28">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Project</h1>
-          <p className="text-gray-400 max-w-2xl mx-auto mb-8">
+          <p className="text-white max-w-2xl mx-auto mb-8">
             A collection of internal and client-based projects developed by our team. Each project
             is built with robust architecture, high data security, and stable performance.
           </p>

@@ -19,7 +19,7 @@ export default function Footer() {
         </div>
 
         <div className="text-center order-last md:order-none">
-          <div>Copyright 2025 @BIT-BO3</div>
+          <div>Copyright 2025 @BIT-B03</div>
         </div>
 
         <div className="flex items-center justify-center gap-3">

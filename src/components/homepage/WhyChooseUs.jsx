@@ -36,7 +36,7 @@ export default function WhyChooseUs() {
         </div>
 
         <div
-          className="flex-shrink-0 md:ml-4 self-center md:self-auto transform translate-y-2 sm:translate-y-6 md:-translate-y-6 lg:-translate-y-3"
+          className="hidden md:block flex-shrink-0 md:ml-4 self-center md:self-auto transform translate-y-2 sm:translate-y-6 md:-translate-y-6 lg:-translate-y-3"
           style={{ width: 'clamp(72px, 18vw, 110px)' }}
         >
           <Puzzle className="w-full h-auto text-white/90" />
