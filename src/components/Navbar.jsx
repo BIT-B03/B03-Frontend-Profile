@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Logo from '../assets/bitlogo.png'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 export default function Navbar({
   navItems = [
@@ -17,6 +17,20 @@ export default function Navbar({
   const [open, setOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('')
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Function to determine if a nav item should be active
+  const isNavItemActive = (href) => {
+    const currentPath = location.pathname
+
+    // Handle route navigation (e.g., "/people", "/about")
+    if (href.startsWith('/')) {
+      return currentPath === href
+    }
+
+    // Handle anchor links
+    return activeSection === href.replace('#', '')
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,10 +124,10 @@ export default function Navbar({
                     href={item.href}
                     onClick={(e) => handleNavClick(e, item.href)}
                     className={[
-                      'px-3 py-1.5 rounded-lg transition-all duration-300 border border-transparent',
-                      activeSection === item.href.replace('#', '')
-                        ? 'bg-brand-getstarted text-pure-white font-bold'
-                        : 'hover:bg-[rgba(34,165,167,0.45)] hover:border-[#22A5A7] hover:text-pure-white',
+                      'px-3 py-1.5 rounded-lg transition-all duration-300 border',
+                      isNavItemActive(item.href)
+                        ? 'bg-[rgba(34,165,167,0.45)] border-[#22A5A7] text-pure-white font-bold'
+                        : 'border-transparent hover:bg-[rgba(34,165,167,0.45)] hover:border-[#22A5A7] hover:text-pure-white',
                     ].join(' ')}
                   >
                     {item.label}
@@ -224,10 +238,10 @@ export default function Navbar({
                       href={item.href}
                       onClick={(e) => handleNavClick(e, item.href)}
                       className={[
-                        'flex items-center gap-3 py-3 px-3 rounded-lg transition-all duration-300 border border-transparent',
-                        activeSection === item.href.replace('#', '')
-                          ? 'bg-brand-getstarted text-pure-white font-bold'
-                          : 'hover:bg-[rgba(34,165,167,0.2)] hover:border-[#22A5A7] hover:text-pure-white text-pure-white/80',
+                        'flex items-center gap-3 py-3 px-3 rounded-lg transition-all duration-300 border',
+                        isNavItemActive(item.href)
+                          ? 'bg-[rgba(34,165,167,0.2)] border-[#22A5A7] text-pure-white font-bold'
+                          : 'border-transparent hover:bg-[rgba(34,165,167,0.2)] hover:border-[#22A5A7] hover:text-pure-white text-pure-white/80',
                       ].join(' ')}
                     >
                       <span className="text-white/70 group-hover:text-white">{iconMap[item.label] || null}</span>
