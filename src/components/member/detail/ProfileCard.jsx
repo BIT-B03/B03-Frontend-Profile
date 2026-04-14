@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { getAvatarImageUrl } from '../../../api/api';
+import { getMemberDisplayPublicUrl } from '../../../api/api';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
 import BioSection from './BioSection';
 
 const ProfileCard = ({ avatarUrl, name, email, position, generation, bio, loading = false }) => {
-    const imageSrc = getAvatarImageUrl(avatarUrl);
+    const imageSrc = getMemberDisplayPublicUrl(avatarUrl);
     const [isLoaded, setIsLoaded] = useState(!imageSrc || loading);
 
     const generationLabel = generation ? `GENERATION ${generation}` : null;

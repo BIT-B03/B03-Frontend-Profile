@@ -1,6 +1,7 @@
 import React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { getAvatarImageUrl } from '../../api/api'
+import ImageCropModal from '../common/ImageCropModal'
 import ContributorSelect from './createProjectModal/ContributorSelect'
 import { Field, PreviewPicker, ThumbnailPicker } from './createProjectModal/FormPieces'
 import { INPUT_CLASS, STATUS_OPTIONS } from '../../constants/createProject/constants'
@@ -27,6 +28,7 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
     removePreview,
     handleSubmit,
     handleClose,
+    cropModalProps,
   } = useCreateProjectForm({ isOpen, onClose, onSuccess })
 
   return (
@@ -158,6 +160,7 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }) {
           </motion.div>
         </div>
       )}
+      <ImageCropModal {...cropModalProps} />
     </AnimatePresence>
   )
 }
