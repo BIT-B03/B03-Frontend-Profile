@@ -5,7 +5,7 @@
             "destination": "https://mzidankusuma.alwaysdata.net/api/$1"
         },
         {
-            "source": "/static/(.*)",
+            "source": "/api/static/(.*)",
             "destination": "https://mzidankusuma.alwaysdata.net/static/$1"
         },
         {
