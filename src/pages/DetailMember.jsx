@@ -60,7 +60,8 @@ function App() {
                 {!error && (
                     <div className="p-6 sm:p-8 md:p-8 space-y-12">
                         <ProfileCard
-                            avatarUrl={userData?.display_url || userData?.avatar_url}
+                            displayUrl={userData?.display_url || null}
+                            avatarUrl={userData?.avatar_url || null}
                             name={userData?.name}
                             username={userData?.username}
                             email={userData?.email}

@@ -1,31 +1,93 @@
 import axios from "axios";
 import { MapAuthError } from "./AuthErrorHandler";
 
-const STATIC_BASE = import.meta.env.VITE_STATIC_BASE || "/static";
+/**
+ * Public file/image endpoints (per backend contract):
+ * - GET /api/userPublic/avatars/<filename>
+ * - GET /api/userPublic/display/<filename>
+ * - GET /api/projectPublic/previews/<filename>
+ * - GET /api/projectPublic/thumbnails/<filename>
+ *
+ * NOTE:
+ * Backend responses in the wild may still return legacy values like:
+ * - "/static/uploads/avatars/<file>" or "uploads/avatars/<file>"
+ * - plain filenames like "21_abc.jpg"
+ *
+ * This helper normalizes those values into the valid /api/* endpoints.
+ */
+
+const ASSET_API_BASE = import.meta.env.VITE_ASSET_API_BASE || "/api";
+
+const stripQueryAndHash = (value) => {
+    const s = String(value);
+    const q = s.indexOf('?');
+    const h = s.indexOf('#');
+    const end = Math.min(q === -1 ? s.length : q, h === -1 ? s.length : h);
+    return s.slice(0, end);
+};
 
 const pickFilename = (value) => {
     if (!value) return "";
-    const str = String(value);
+    const str = stripQueryAndHash(value);
     const parts = str.split("/").filter(Boolean);
     return parts.length ? parts[parts.length - 1] : str;
 };
 
-const buildStaticUploadsUrl = (folder, filenameOrPath) => {
+const ASSET_KIND_TO_PREFIX = {
+    avatar: "/userPublic/avatars",
+    display: "/userPublic/display",
+    preview: "/projectPublic/previews",
+    thumbnail: "/projectPublic/thumbnails",
+};
+
+const inferAssetKindFromPath = (raw) => {
+    if (!raw) return null;
+    const s = String(raw).toLowerCase();
+    if (s.includes("/avatars/") || s.includes("uploads/avatars/") || s.includes("userpublic/avatars/")) return "avatar";
+    if (s.includes("/display/") || s.includes("uploads/display/") || s.includes("userpublic/display/")) return "display";
+    if (s.includes("/previews/") || s.includes("uploads/previews/") || s.includes("projectpublic/previews/")) return "preview";
+    if (s.includes("/thumbnails/") || s.includes("uploads/thumbnails/") || s.includes("projectpublic/thumbnails/")) return "thumbnail";
+    return null;
+};
+
+const ensureLeadingSlash = (s) => (s.startsWith("/") ? s : `/${s}`);
+
+const buildPublicAssetUrl = (kind, filenameOrPath) => {
     if (!filenameOrPath) return null;
+
     const raw = String(filenameOrPath);
 
-    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+    // passthrough absolute URL
+    if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
 
-    // If API already returns a static path
-    if (raw.startsWith('/static/')) return raw;
-    if (raw.startsWith('static/')) return `/${raw}`;
+    // passthrough if already routed via /api
+    if (raw.startsWith("/api/")) return raw;
+    if (raw.startsWith("api/")) return `/${raw}`;
 
-    // If API returns uploads/... path
-    if (raw.startsWith('/uploads/')) return `${STATIC_BASE}${raw}`;
-    if (raw.startsWith('uploads/')) return `${STATIC_BASE}/${raw}`;
+    // If backend returns a path without /api prefix
+    if (
+        raw.startsWith("/userPublic/") ||
+        raw.startsWith("/projectPublic/") ||
+        raw.startsWith("/admin/")
+    ) {
+        return `${ASSET_API_BASE}${raw}`;
+    }
+    if (
+        raw.startsWith("userPublic/") ||
+        raw.startsWith("projectPublic/") ||
+        raw.startsWith("admin/")
+    ) {
+        return `${ASSET_API_BASE}/${raw}`;
+    }
+    const inferredKind = inferAssetKindFromPath(raw);
+    const finalKind = inferredKind || kind;
+    const prefix = ASSET_KIND_TO_PREFIX[finalKind] || ASSET_KIND_TO_PREFIX[kind];
+    if (!prefix) return null;
 
-    // Fallback to filename only
-    return `${STATIC_BASE}/uploads/${folder}/${pickFilename(raw)}`;
+    const filename = pickFilename(raw);
+    if (!filename) return null;
+
+    return `${ASSET_API_BASE}${ensureLeadingSlash(prefix)}/${encodeURIComponent(filename)}`;
 };
 
 const API = axios.create({
@@ -173,7 +235,7 @@ export const getUserPublicData = async (userHashedId) => {
 
 // Build avatar image URL from filename/path returned by API
 export const getAvatarImageUrl = (filename) => {
-    return buildStaticUploadsUrl('avatars', filename);
+    return buildPublicAssetUrl('avatar', filename);
 };
 
 // Fetch current authenticated user's profile
@@ -206,12 +268,12 @@ export const getProjectPublicData = async (projectHashedId) => {
 
 // Build preview image URL from filename/path returned by API
 export const getProjectPreviewImageUrl = (filename) => {
-    return buildStaticUploadsUrl('previews', filename);
+    return buildPublicAssetUrl('preview', filename);
 };
 
 // Build thumbnail image URL from filename/path returned by API
 export const getProjectThumbnailImageUrl = (filename) => {
-    return buildStaticUploadsUrl('thumbnails', filename);
+    return buildPublicAssetUrl('thumbnail', filename);
 };
 
 // GET /api/projectPublic/projects?created_by=:hashedId  →  projects milik creator tertentu
@@ -413,7 +475,7 @@ export const deleteMemberDisplay = async (userHashedId) => {
 };
 
 export const getMemberDisplayPublicUrl = (filename) => {
-    return buildStaticUploadsUrl('display', filename);
+    return buildPublicAssetUrl('display', filename);
 };
 
 // ADMIN PELAMAR

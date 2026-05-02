@@ -1,5 +1,5 @@
 import React from 'react'
-import { getAvatarImageUrl } from '../../api/api'
+import { getAvatarImageUrl, getProjectThumbnailImageUrl } from '../../api/api'
 import { getProjectStatusMeta } from '../../utils/projectStatus'
 import { ourProjectIconMap } from '../../utils/icon'
 
@@ -50,7 +50,7 @@ export default function ProjectCard({ project, onViewDetail, maxDescriptionWords
       <div className="relative overflow-hidden aspect-video bg-gradient-to-br from-gray-800 to-gray-900">
         {project.thumbnail_url ? (
           <img
-            src={`${project.apiBase || '/api/projectPublic'}/thumbnails/${project.thumbnail_url}`}
+            src={getProjectThumbnailImageUrl(project.thumbnail_url)}
             alt={project.title}
             className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
             onError={(e) => {

@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ImageWithSkeleton from './ImageWithSkeleton';
-import { getMemberDisplayPublicUrl } from '../../../api/api';
+import { getAvatarImageUrl, getMemberDisplayPublicUrl } from '../../../api/api';
 
 const MemberCard = ({ member }) => {
     const navigate = useNavigate();
-    const avatarUrl = member.display_url || member.avatar_url ? getMemberDisplayPublicUrl(member.display_url || member.avatar_url) : null;
+    const avatarUrl = member?.display_url
+        ? getMemberDisplayPublicUrl(member.display_url)
+        : member?.avatar_url
+            ? getAvatarImageUrl(member.avatar_url)
+            : null;
     const [isLoaded, setIsLoaded] = useState(!avatarUrl);
     const placeholderLetter = (member.name || '').trim().charAt(0).toUpperCase() || '?';
 
