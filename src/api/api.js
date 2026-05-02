@@ -1,8 +1,35 @@
 import axios from "axios";
 import { MapAuthError } from "./AuthErrorHandler";
 
+const STATIC_BASE = import.meta.env.VITE_STATIC_BASE || "/static";
+
+const pickFilename = (value) => {
+    if (!value) return "";
+    const str = String(value);
+    const parts = str.split("/").filter(Boolean);
+    return parts.length ? parts[parts.length - 1] : str;
+};
+
+const buildStaticUploadsUrl = (folder, filenameOrPath) => {
+    if (!filenameOrPath) return null;
+    const raw = String(filenameOrPath);
+
+    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+
+    // If API already returns a static path
+    if (raw.startsWith('/static/')) return raw;
+    if (raw.startsWith('static/')) return `/${raw}`;
+
+    // If API returns uploads/... path
+    if (raw.startsWith('/uploads/')) return `${STATIC_BASE}${raw}`;
+    if (raw.startsWith('uploads/')) return `${STATIC_BASE}/${raw}`;
+
+    // Fallback to filename only
+    return `${STATIC_BASE}/uploads/${folder}/${pickFilename(raw)}`;
+};
+
 const API = axios.create({
-    baseURL: "/api",
+    baseURL: import.meta.env.VITE_BACKEND_URL || "/api",
 });
 
 if (typeof window !== "undefined") {
@@ -146,40 +173,19 @@ export const getUserPublicData = async (userHashedId) => {
 
 // Build avatar image URL from filename/path returned by API
 export const getAvatarImageUrl = (filename) => {
-    if (!filename) return null;
-    if (filename.startsWith('http://') || filename.startsWith('https://')) return filename;
-
-    const cleaned = filename.startsWith('/') ? filename.slice(1) : filename;
-    if (cleaned.startsWith('api/userPublic/avatars/')) {
-        return `/${cleaned}`;
-    }
-
-    const normalized = cleaned.includes('uploads/avatars/')
-        ? cleaned.split('uploads/avatars/').pop()
-        : cleaned.split('/').pop();
-
-    return `/api/userPublic/avatars/${normalized}`;
+    return buildStaticUploadsUrl('avatars', filename);
 };
 
 // Fetch current authenticated user's profile
 export const GetMyProfile = async () => {
-    try {
-        const response = await API.get('/user/me');
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
+    const response = await API.get('/user/me');
+    return response.data;
 };
 
 // Update current authenticated user's profile (multipart/form-data)
 export const UpdateMyProfile = async (formData) => {
-    try {
-        const response = await API.put('/user/me', formData);
-
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
+    const response = await API.put('/user/me', formData);
+    return response.data;
 };
 
 // Fetch dashboard statistics for current (authenticated) user
@@ -200,16 +206,12 @@ export const getProjectPublicData = async (projectHashedId) => {
 
 // Build preview image URL from filename/path returned by API
 export const getProjectPreviewImageUrl = (filename) => {
-    if (!filename) return null;
-    const safe = filename.startsWith('/') ? filename.slice(1) : filename;
-    return `/api/projectPublic/previews/${safe}`;
+    return buildStaticUploadsUrl('previews', filename);
 };
 
 // Build thumbnail image URL from filename/path returned by API
 export const getProjectThumbnailImageUrl = (filename) => {
-    if (!filename) return null;
-    const safe = filename.startsWith('/') ? filename.slice(1) : filename;
-    return `/api/projectPublic/thumbnails/${safe}`;
+    return buildStaticUploadsUrl('thumbnails', filename);
 };
 
 // GET /api/projectPublic/projects?created_by=:hashedId  →  projects milik creator tertentu
@@ -411,9 +413,7 @@ export const deleteMemberDisplay = async (userHashedId) => {
 };
 
 export const getMemberDisplayPublicUrl = (filename) => {
-    if (!filename) return null;
-    const safe = filename.startsWith('/') ? filename.slice(1) : filename;
-    return `/api/userPublic/display/${safe}`;
+    return buildStaticUploadsUrl('display', filename);
 };
 
 // ADMIN PELAMAR
