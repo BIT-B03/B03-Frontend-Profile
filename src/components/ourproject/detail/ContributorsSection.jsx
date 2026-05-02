@@ -1,6 +1,6 @@
 import React from 'react';
 import GitIcon from '../../../assets/Git.svg';
-import RectIcon from '../../../assets/rectangle.svg';
+import RectIcon from '../../../assets/Rectangle.svg';
 import MemberCard from '../../member/common/MemberCard';
 import { GRID_CLASSES } from '../../member/common/ImageWithSkeleton';
 
