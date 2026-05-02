@@ -2,7 +2,7 @@ import axios from "axios";
 import { MapAuthError } from "./AuthErrorHandler";
 
 const API = axios.create({
-    baseURL: "/api",
+    baseURL: import.meta.env.VITE_BACKEND_URL || "/api",
 });
 
 if (typeof window !== "undefined") {
