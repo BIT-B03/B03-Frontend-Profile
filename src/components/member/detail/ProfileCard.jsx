@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
-import { getMemberDisplayPublicUrl } from '../../../api/api';
+import { getAvatarImageUrl, getMemberDisplayPublicUrl } from '../../../api/api';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
 import BioSection from './BioSection';
 
-const ProfileCard = ({ avatarUrl, name, email, position, generation, bio, loading = false }) => {
-    const imageSrc = getMemberDisplayPublicUrl(avatarUrl);
+const looksLikeDisplay = (value) => {
+    if (!value) return false;
+    const s = String(value).toLowerCase();
+    return s.includes('/display/') || s.includes('uploads/display') || s.includes('userpublic/display');
+};
+
+const ProfileCard = ({ displayUrl, avatarUrl, name, email, position, generation, bio, loading = false }) => {
+    // Prefer displayUrl; fallback to avatarUrl. Kept compatible with older callers.
+    const raw = displayUrl || avatarUrl || null;
+    const imageSrc = !raw
+        ? null
+        : displayUrl
+            ? getMemberDisplayPublicUrl(displayUrl)
+            : looksLikeDisplay(raw)
+                ? getMemberDisplayPublicUrl(raw)
+                : getAvatarImageUrl(raw);
     const [isLoaded, setIsLoaded] = useState(!imageSrc || loading);
 
     const generationLabel = generation ? `GENERATION ${generation}` : null;

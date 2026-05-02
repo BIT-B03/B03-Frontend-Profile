@@ -6,6 +6,7 @@ import {
     deleteMemberDisplay,
     editMemberDisplay,
     getAdminMemberDetail,
+    getAvatarImageUrl,
     getMemberDisplayPublicUrl,
     uploadMemberDisplay,
 } from '../../api/api';
@@ -89,8 +90,11 @@ export default function MemberSettingsModal({ isOpen, member, formState, onChang
 
     const photoSrc = useMemo(() => {
         if (photoPreviewUrl) return photoPreviewUrl;
-        const src = profile?.display_url || profile?.avatar_url || member?.display_url || member?.avatar_url || null;
-        return src ? getMemberDisplayPublicUrl(src) : null;
+        const displaySrc = profile?.display_url || member?.display_url || null;
+        if (displaySrc) return getMemberDisplayPublicUrl(displaySrc);
+
+        const avatarSrc = profile?.avatar_url || member?.avatar_url || null;
+        return avatarSrc ? getAvatarImageUrl(avatarSrc) : null;
     }, [photoPreviewUrl, profile?.display_url, profile?.avatar_url, member?.display_url, member?.avatar_url]);
 
     const photoAlt = profile?.name || member?.name || 'Selected member';
