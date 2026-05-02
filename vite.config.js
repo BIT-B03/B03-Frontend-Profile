@@ -11,6 +11,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/static': {
+        target: 'https://mzidankusuma.alwaysdata.net/',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })

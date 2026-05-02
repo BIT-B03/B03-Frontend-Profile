@@ -1,0 +1,16 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "https://mzidankusuma.alwaysdata.net/api/$1"
+        },
+        {
+            "source": "/static/(.*)",
+            "destination": "https://mzidankusuma.alwaysdata.net/static/$1"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}
